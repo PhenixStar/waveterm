@@ -41,6 +41,27 @@ type JobCmd struct {
 	exitTs        int64
 }
 
+const maxUint16 = int(^uint16(0))
+
+func toWinsizeDimension(v int) uint16 {
+	if v <= 0 {
+		return 0
+	}
+	if v > maxUint16 {
+		return uint16(maxUint16)
+	}
+	return uint16(v)
+}
+
+func winsizeFromTermSize(termSize waveobj.TermSize) *pty.Winsize {
+	return &pty.Winsize{
+		Rows: toWinsizeDimension(termSize.Rows),
+		Cols: toWinsizeDimension(termSize.Cols),
+		X:    toWinsizeDimension(termSize.XPixel),
+		Y:    toWinsizeDimension(termSize.YPixel),
+	}
+}
+
 func MakeJobCmd(jobId string, cmdDef CmdDef) (*JobCmd, error) {
 	jm := &JobCmd{
 		jobId: jobId,
@@ -59,7 +80,7 @@ func MakeJobCmd(jobId string, cmdDef CmdDef) (*JobCmd, error) {
 			ecmd.Env = append(ecmd.Env, fmt.Sprintf("%s=%s", key, val))
 		}
 	}
-	cmdPty, err := pty.StartWithSize(ecmd, &pty.Winsize{Rows: uint16(cmdDef.TermSize.Rows), Cols: uint16(cmdDef.TermSize.Cols)})
+	cmdPty, err := pty.StartWithSize(ecmd, winsizeFromTermSize(cmdDef.TermSize))
 	if err != nil {
 		return nil, fmt.Errorf("failed to start command: %w", err)
 	}
@@ -156,13 +177,13 @@ func (jm *JobCmd) setTermSize_withlock(termSize waveobj.TermSize) error {
 	if jm.cmdPty == nil {
 		return fmt.Errorf("no active pty")
 	}
-	if jm.termSize.Rows == termSize.Rows && jm.termSize.Cols == termSize.Cols {
+	if jm.termSize.Rows == termSize.Rows &&
+		jm.termSize.Cols == termSize.Cols &&
+		jm.termSize.XPixel == termSize.XPixel &&
+		jm.termSize.YPixel == termSize.YPixel {
 		return nil
 	}
-	err := pty.Setsize(jm.cmdPty, &pty.Winsize{
-		Rows: uint16(termSize.Rows),
-		Cols: uint16(termSize.Cols),
-	})
+	err := pty.Setsize(jm.cmdPty, winsizeFromTermSize(termSize))
 	if err != nil {
 		return fmt.Errorf("error setting terminal size: %w", err)
 	}

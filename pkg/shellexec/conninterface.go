@@ -15,6 +15,7 @@ import (
 	"github.com/creack/pty"
 	"github.com/wavetermdev/waveterm/pkg/panichandler"
 	"github.com/wavetermdev/waveterm/pkg/util/unixutil"
+	"github.com/wavetermdev/waveterm/pkg/waveobj"
 	"github.com/wavetermdev/waveterm/pkg/wsl"
 	"golang.org/x/crypto/ssh"
 )
@@ -29,7 +30,7 @@ type ConnInterface interface {
 	StdinPipe() (io.WriteCloser, error)
 	StdoutPipe() (io.ReadCloser, error)
 	StderrPipe() (io.ReadCloser, error)
-	SetSize(w int, h int) error
+	SetSize(termSize waveobj.TermSize) error
 	pty.Pty
 }
 
@@ -133,8 +134,8 @@ func (cw CmdWrap) StderrPipe() (io.ReadCloser, error) {
 	return cw.Cmd.StderrPipe()
 }
 
-func (cw CmdWrap) SetSize(w int, h int) error {
-	err := pty.Setsize(cw.Pty, &pty.Winsize{Rows: uint16(w), Cols: uint16(h)})
+func (cw CmdWrap) SetSize(termSize waveobj.TermSize) error {
+	err := pty.Setsize(cw.Pty, winsizeFromTermSize(termSize))
 	if err != nil {
 		return err
 	}
@@ -221,8 +222,8 @@ func (sw SessionWrap) StderrPipe() (io.ReadCloser, error) {
 	return io.NopCloser(stderrReader), nil
 }
 
-func (sw SessionWrap) SetSize(h int, w int) error {
-	return sw.Session.WindowChange(h, w)
+func (sw SessionWrap) SetSize(termSize waveobj.TermSize) error {
+	return sw.Session.WindowChange(termSize.Rows, termSize.Cols)
 }
 
 type WslCmdWrap struct {
@@ -263,6 +264,6 @@ func (wcw WslCmdWrap) KillGraceful(timeout time.Duration) {
  * SetSize does nothing for WslCmdWrap as there
  * is no pty to manage.
 **/
-func (wcw WslCmdWrap) SetSize(w int, h int) error {
+func (wcw WslCmdWrap) SetSize(termSize waveobj.TermSize) error {
 	return nil
 }

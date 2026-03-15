@@ -3,8 +3,15 @@
 
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
-import { getApi, getBlockMetaKeyAtom, getBlockTermDurableAtom, globalStore, recordTEvent, WOS } from "@/store/global";
-import * as services from "@/store/services";
+import {
+    getApi,
+    getBlockMetaKeyAtom,
+    getBlockTermDurableAtom,
+    getOverrideConfigAtom,
+    globalStore,
+    recordTEvent,
+    WOS,
+} from "@/store/global";
 import { base64ToString, fireAndForget, isSshConnName, isWslConnName } from "@/util/util";
 import debug from "debug";
 import type { TermWrap } from "./termwrap";
@@ -33,7 +40,7 @@ type Osc16162Command =
           };
       }
     | { command: "D"; data: { exitcode?: number } }
-    | { command: "I"; data: { inputempty?: boolean } }
+    | { command: "I"; data: { buffer64?: string; cursor?: number } }
     | { command: "R"; data: Record<string, never> };
 
 function checkCommandForTelemetry(decodedCmd: string) {
@@ -78,7 +85,11 @@ function handleShellIntegrationCommandStart(
     rtInfo: ObjRTInfo // this is passed by reference and modified inside of this function
 ): void {
     rtInfo["shell:state"] = "running-command";
+    rtInfo["shell:inputbuffer64"] = null;
+    rtInfo["shell:inputcursor"] = null;
     globalStore.set(termWrap.shellIntegrationStatusAtom, "running-command");
+    globalStore.set(termWrap.shellInputBufferAtom, null);
+    globalStore.set(termWrap.shellInputCursorAtom, null);
     const connName = globalStore.get(getBlockMetaKeyAtom(blockId, "connection")) ?? "";
     const isRemote = isSshConnName(connName);
     const isWsl = isWslConnName(connName);
@@ -108,16 +119,41 @@ function handleShellIntegrationCommandStart(
     rtInfo["shell:lastcmdexitcode"] = null;
 }
 
+function handleShellIntegrationInputReadback(
+    termWrap: TermWrap,
+    cmd: { command: "I"; data: { buffer64?: string; cursor?: number } },
+    rtInfo: ObjRTInfo
+): void {
+    const { buffer64, cursor } = cmd.data;
+    if (buffer64 == null || typeof cursor != "number" || !isFinite(cursor)) {
+        return;
+    }
+    let decodedBuffer: string;
+    try {
+        decodedBuffer = base64ToString(buffer64);
+    } catch (e) {
+        console.error("Error decoding shell input buffer64:", e);
+        return;
+    }
+    rtInfo["shell:inputbuffer64"] = buffer64;
+    rtInfo["shell:inputcursor"] = cursor;
+    globalStore.set(termWrap.shellInputBufferAtom, decodedBuffer);
+    globalStore.set(termWrap.shellInputCursorAtom, cursor);
+}
+
 // for xterm OSC handlers, we return true always because we "own" the OSC number.
 // even if data is invalid we don't want to propagate to other handlers.
 export function handleOsc52Command(data: string, blockId: string, loaded: boolean, termWrap: TermWrap): boolean {
     if (!loaded) {
         return true;
     }
-    const isBlockFocused = termWrap.nodeModel ? globalStore.get(termWrap.nodeModel.isFocused) : false;
-    if (!document.hasFocus() || !isBlockFocused) {
-        console.log("OSC 52: rejected, window or block not focused");
-        return true;
+    const osc52Mode = globalStore.get(getOverrideConfigAtom(blockId, "term:osc52")) ?? "always";
+    if (osc52Mode === "focus") {
+        const isBlockFocused = termWrap.nodeModel ? globalStore.get(termWrap.nodeModel.isFocused) : false;
+        if (!document.hasFocus() || !isBlockFocused) {
+            console.log("OSC 52: rejected, window or block not focused");
+            return true;
+        }
     }
     if (!data || data.length === 0) {
         console.log("OSC 52: empty data received");
@@ -232,8 +268,9 @@ export function handleOsc7Command(data: string, blockId: string, loaded: boolean
 
     setTimeout(() => {
         fireAndForget(async () => {
-            await services.ObjectService.UpdateObjectMeta(WOS.makeORef("block", blockId), {
-                "cmd:cwd": pathPart,
+            await RpcApi.SetMetaCommand(TabRpcClient, {
+                oref: WOS.makeORef("block", blockId),
+                meta: { "cmd:cwd": pathPart },
             });
 
             const rtInfo = { "shell:hascurcwd": true };
@@ -320,12 +357,12 @@ export function handleOsc16162Command(data: string, blockId: string, loaded: boo
             }
             break;
         case "I":
-            if (cmd.data.inputempty != null) {
-                rtInfo["shell:inputempty"] = cmd.data.inputempty;
-            }
+            handleShellIntegrationInputReadback(termWrap, cmd, rtInfo);
             break;
         case "R":
             globalStore.set(termWrap.shellIntegrationStatusAtom, null);
+            globalStore.set(termWrap.shellInputBufferAtom, null);
+            globalStore.set(termWrap.shellInputCursorAtom, null);
             if (terminal.buffer.active.type === "alternate") {
                 terminal.write("\x1b[?1049l");
             }

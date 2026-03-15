@@ -2,26 +2,27 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { BlockNodeModel } from "@/app/block/blocktypes";
+import { setBadge } from "@/app/store/badge";
 import { getFileSubject } from "@/app/store/wps";
 import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import {
-    atoms,
     fetchWaveFile,
     getOverrideConfigAtom,
     getSettingsKeyAtom,
     globalStore,
+    isDev,
     openLink,
-    setTabIndicator,
     WOS,
 } from "@/store/global";
 import * as services from "@/store/services";
 import { PLATFORM, PlatformMacOS } from "@/util/platformutil";
-import { base64ToArray, fireAndForget } from "@/util/util";
+import { base64ToArray, base64ToString, fireAndForget } from "@/util/util";
 import { SearchAddon } from "@xterm/addon-search";
 import { SerializeAddon } from "@xterm/addon-serialize";
 import { WebLinksAddon } from "@xterm/addon-web-links";
 import { WebglAddon } from "@xterm/addon-webgl";
+import { ImageAddon } from "@xterm/addon-image";
 import * as TermTypes from "@xterm/xterm";
 import { Terminal } from "@xterm/xterm";
 import debug from "debug";
@@ -34,6 +35,7 @@ import {
     handleOsc7Command,
     type ShellIntegrationStatus,
 } from "./osc-handlers";
+import { FilePathLinkProvider } from "./term-link-provider";
 import { bufferLinesToText, createTempFileFromBlob, extractAllClipboardData, normalizeCursorStyle } from "./termutil";
 
 const dlog = debug("wave:termwrap");
@@ -43,6 +45,7 @@ const TermCacheFileName = "cache:term:full";
 const MinDataProcessedForCache = 100 * 1024;
 export const SupportsImageInput = true;
 const IMEDedupWindowMs = 20;
+const MaxRepaintTransactionMs = 2000;
 
 // detect webgl support
 function detectWebGLSupport(): boolean {
@@ -61,6 +64,7 @@ let loggedWebGL = false;
 type TermWrapOptions = {
     keydownHandler?: (e: KeyboardEvent) => boolean;
     useWebGl?: boolean;
+    useSixel?: boolean;
     sendDataHandler?: (data: string) => void;
     nodeModel?: BlockNodeModel;
 };
@@ -89,6 +93,8 @@ export class TermWrap {
     promptMarkers: TermTypes.IMarker[] = [];
     shellIntegrationStatusAtom: jotai.PrimitiveAtom<ShellIntegrationStatus | null>;
     lastCommandAtom: jotai.PrimitiveAtom<string | null>;
+    shellInputBufferAtom: jotai.PrimitiveAtom<string | null>;
+    shellInputCursorAtom: jotai.PrimitiveAtom<number | null>;
     nodeModel: BlockNodeModel; // this can be null
     hoveredLinkUri: string | null = null;
     onLinkHover?: (uri: string | null, mouseX: number, mouseY: number) => void;
@@ -104,9 +110,23 @@ export class TermWrap {
     // xterm.js paste() method triggers onData event, which can cause duplicate sends
     lastPasteData: string = "";
     lastPasteTime: number = 0;
+
+    // for scrollToBottom support during a resize
     lastAtBottomTime: number = Date.now();
     lastScrollAtBottom: boolean = true;
     cachedAtBottomForResize: boolean | null = null;
+    viewportScrollTop: number = 0;
+
+    // dev only (for debugging)
+    recentWrites: { idx: number; data: string; ts: number }[] = [];
+    recentWritesCounter: number = 0;
+
+    // for repaint transaction scrolling behavior
+    lastClearScrollbackTs: number = 0;
+    lastMode2026SetTs: number = 0;
+    lastMode2026ResetTs: number = 0;
+    inSyncTransaction: boolean = false;
+    inRepaintTransaction: boolean = false;
 
     constructor(
         tabId: string,
@@ -127,9 +147,11 @@ export class TermWrap {
         this.promptMarkers = [];
         this.shellIntegrationStatusAtom = jotai.atom(null) as jotai.PrimitiveAtom<ShellIntegrationStatus | null>;
         this.lastCommandAtom = jotai.atom(null) as jotai.PrimitiveAtom<string | null>;
+        this.shellInputBufferAtom = jotai.atom(null) as jotai.PrimitiveAtom<string | null>;
+        this.shellInputCursorAtom = jotai.atom(null) as jotai.PrimitiveAtom<number | null>;
         this.terminal = new Terminal(options);
         this.fitAddon = new FitAddon();
-        this.fitAddon.noScrollbar = PLATFORM === PlatformMacOS;
+        this.fitAddon.scrollbarWidth = 6; // this needs to match scrollbar width in term.scss
         this.serializeAddon = new SerializeAddon();
         this.searchAddon = new SearchAddon();
         this.terminal.loadAddon(this.searchAddon);
@@ -177,6 +199,19 @@ export class TermWrap {
                 loggedWebGL = true;
             }
         }
+        if (waveOptions.useSixel ?? true) {
+            try {
+                this.terminal.loadAddon(
+                    new ImageAddon({
+                        enableSizeReports: true,
+                        sixelSupport: true,
+                        iipSupport: false,
+                    })
+                );
+            } catch (e) {
+                console.error("failed to load image addon for sixel support", e);
+            }
+        }
         // Register OSC handlers
         this.terminal.parser.registerOscHandler(7, (data: string) => {
             return handleOsc7Command(data, this.blockId, this.loaded);
@@ -187,6 +222,47 @@ export class TermWrap {
         this.terminal.parser.registerOscHandler(16162, (data: string) => {
             return handleOsc16162Command(data, this.blockId, this.loaded, this);
         });
+        this.toDispose.push(
+            this.terminal.registerLinkProvider(new FilePathLinkProvider(this.terminal, this.blockId))
+        );
+        this.toDispose.push(
+            this.terminal.parser.registerCsiHandler({ final: "J" }, (params) => {
+                if (params[0] === 3) {
+                    this.lastClearScrollbackTs = Date.now();
+                    if (this.inSyncTransaction) {
+                        console.log("[termwrap] repaint transaction starting");
+                        this.inRepaintTransaction = true;
+                    }
+                }
+                return false;
+            })
+        );
+        this.toDispose.push(
+            this.terminal.parser.registerCsiHandler({ prefix: "?", final: "h" }, (params) => {
+                if (params[0] === 2026) {
+                    this.lastMode2026SetTs = Date.now();
+                    this.inSyncTransaction = true;
+                }
+                return false;
+            })
+        );
+        this.toDispose.push(
+            this.terminal.parser.registerCsiHandler({ prefix: "?", final: "l" }, (params) => {
+                if (params[0] === 2026) {
+                    this.lastMode2026ResetTs = Date.now();
+                    this.inSyncTransaction = false;
+                    const wasRepaint = this.inRepaintTransaction;
+                    this.inRepaintTransaction = false;
+                    if (wasRepaint && Date.now() - this.lastClearScrollbackTs <= MaxRepaintTransactionMs) {
+                        setTimeout(() => {
+                            console.log("[termwrap] repaint transaction complete, scrolling to bottom");
+                            this.terminal.scrollToBottom();
+                        }, 20);
+                    }
+                }
+                return false;
+            })
+        );
         this.toDispose.push(
             this.terminal.onBell(() => {
                 if (!this.loaded) {
@@ -201,8 +277,7 @@ export class TermWrap {
                 const bellIndicatorEnabled =
                     globalStore.get(getOverrideConfigAtom(this.blockId, "term:bellindicator")) ?? false;
                 if (bellIndicatorEnabled) {
-                    const tabId = globalStore.get(atoms.staticTabId);
-                    setTabIndicator(tabId, { icon: "bell", color: "#fbbf24", clearonfocus: true, priority: 1 });
+                    setBadge(this.blockId, { icon: "bell", color: "#fbbf24", priority: 1 });
                 }
                 return true;
             })
@@ -231,9 +306,8 @@ export class TermWrap {
         });
         const viewportElem = this.connectElem.querySelector(".xterm-viewport") as HTMLElement;
         if (viewportElem) {
-            const scrollHandler = () => {
-                const atBottom = viewportElem.scrollTop + viewportElem.clientHeight >= viewportElem.scrollHeight - 20;
-                this.setAtBottom(atBottom);
+            const scrollHandler = (e: any) => {
+                this.handleViewportScroll(viewportElem);
             };
             viewportElem.addEventListener("scroll", scrollHandler);
             this.toDispose.push({
@@ -292,6 +366,12 @@ export class TermWrap {
                     if (!globalStore.get(copyOnSelectAtom)) {
                         return;
                     }
+                    // Don't copy-on-select when the search bar has focus — navigating
+                    // search results changes the terminal selection programmatically.
+                    const active = document.activeElement;
+                    if (active != null && active.closest(".search-container") != null) {
+                        return;
+                    }
                     const selectedText = this.terminal.getSelection();
                     if (selectedText.length > 0) {
                         navigator.clipboard.writeText(selectedText);
@@ -346,6 +426,19 @@ export class TermWrap {
 
             const lastCmd = rtInfo ? rtInfo["shell:lastcmd"] : null;
             globalStore.set(this.lastCommandAtom, lastCmd || null);
+            const inputBuffer64 = rtInfo ? rtInfo["shell:inputbuffer64"] : null;
+            if (inputBuffer64 == null) {
+                globalStore.set(this.shellInputBufferAtom, null);
+            } else {
+                try {
+                    globalStore.set(this.shellInputBufferAtom, base64ToString(inputBuffer64));
+                } catch (e) {
+                    console.error("Error loading shell input buffer:", e);
+                    globalStore.set(this.shellInputBufferAtom, null);
+                }
+            }
+            const inputCursor = rtInfo ? rtInfo["shell:inputcursor"] : null;
+            globalStore.set(this.shellInputCursorAtom, inputCursor == null ? null : inputCursor);
         } catch (e) {
             console.log("Error loading runtime info:", e);
         }
@@ -416,6 +509,13 @@ export class TermWrap {
     }
 
     doTerminalWrite(data: string | Uint8Array, setPtyOffset?: number): Promise<void> {
+        if (isDev() && this.loaded) {
+            const dataStr = data instanceof Uint8Array ? new TextDecoder().decode(data) : data;
+            this.recentWrites.push({ idx: this.recentWritesCounter++, ts: Date.now(), data: dataStr });
+            if (this.recentWrites.length > 50) {
+                this.recentWrites.shift();
+            }
+        }
         let resolve: () => void = null;
         let prtn = new Promise<void>((presolve, _) => {
             resolve = presolve;
@@ -433,6 +533,35 @@ export class TermWrap {
         return prtn;
     }
 
+    private getTerminalPixelSize(): { xpixel: number; ypixel: number } {
+        const screenElem = this.connectElem.querySelector(".xterm-screen") as HTMLElement | null;
+        const targetElem = screenElem ?? this.connectElem;
+        const rect = targetElem.getBoundingClientRect();
+        return {
+            xpixel: Math.max(0, Math.floor(rect.width)),
+            ypixel: Math.max(0, Math.floor(rect.height)),
+        };
+    }
+
+    private areTermSizesEqual(a: TermSize, b: TermSize): boolean {
+        return (
+            a.rows === b.rows &&
+            a.cols === b.cols &&
+            (a.xpixel ?? 0) === (b.xpixel ?? 0) &&
+            (a.ypixel ?? 0) === (b.ypixel ?? 0)
+        );
+    }
+
+    getTermSize(): TermSize {
+        const { xpixel, ypixel } = this.getTerminalPixelSize();
+        const termSize: TermSize = { rows: this.terminal.rows, cols: this.terminal.cols };
+        if (xpixel > 0 && ypixel > 0) {
+            termSize.xpixel = xpixel;
+            termSize.ypixel = ypixel;
+        }
+        return termSize;
+    }
+
     async loadInitialTerminalData(): Promise<void> {
         const startTs = Date.now();
         const zoneId = this.getZoneId();
@@ -441,7 +570,7 @@ export class TermWrap {
         if (cacheFile != null) {
             ptyOffset = cacheFile.meta["ptyoffset"] ?? 0;
             if (cacheData.byteLength > 0) {
-                const curTermSize: TermSize = { rows: this.terminal.rows, cols: this.terminal.cols };
+                const curTermSize: TermSize = this.getTermSize();
                 const fileTermSize: TermSize = cacheFile.meta["termsize"];
                 let didResize = false;
                 if (
@@ -469,7 +598,7 @@ export class TermWrap {
 
     async resyncController(reason: string) {
         dlog("resync controller", this.blockId, reason);
-        const rtOpts: RuntimeOpts = { termsize: { rows: this.terminal.rows, cols: this.terminal.cols } };
+        const rtOpts: RuntimeOpts = { termsize: this.getTermSize() };
         try {
             await RpcApi.ControllerResyncCommand(TabRpcClient, {
                 tabid: this.tabId,
@@ -498,25 +627,51 @@ export class TermWrap {
         return Date.now() - this.lastAtBottomTime <= 1000;
     }
 
+    handleViewportScroll(viewportElem: HTMLElement) {
+        const { scrollTop, scrollHeight, clientHeight } = viewportElem;
+        const atBottom = scrollTop + clientHeight >= scrollHeight - clientHeight * 0.5;
+        this.setAtBottom(atBottom);
+        const delta = this.viewportScrollTop - scrollTop;
+        if (isDev() && delta >= 500) {
+            console.log(
+                `[termwrap] large-scroll blockId=${this.blockId} delta=${Math.round(delta)}px scrollTop=${scrollTop} wasNearBottom=${atBottom}`
+            );
+        }
+        this.viewportScrollTop = scrollTop;
+    }
+
     handleResize() {
-        const oldRows = this.terminal.rows;
-        const oldCols = this.terminal.cols;
+        const oldTermSize = this.getTermSize();
         const atBottom = this.cachedAtBottomForResize ?? this.wasRecentlyAtBottom();
         if (!atBottom) {
             this.cachedAtBottomForResize = null;
         }
         this.fitAddon.fit();
-        if (oldRows !== this.terminal.rows || oldCols !== this.terminal.cols) {
-            const termSize: TermSize = { rows: this.terminal.rows, cols: this.terminal.cols };
-            RpcApi.ControllerInputCommand(TabRpcClient, { blockid: this.blockId, termsize: termSize });
+        const newTermSize = this.getTermSize();
+        if (!this.areTermSizesEqual(oldTermSize, newTermSize)) {
+            console.log(
+                "[termwrap] resize",
+                `${oldTermSize.rows}x${oldTermSize.cols}`,
+                "->",
+                `${newTermSize.rows}x${newTermSize.cols}`,
+                "atBottom:",
+                atBottom
+            );
+            RpcApi.ControllerInputCommand(TabRpcClient, { blockid: this.blockId, termsize: newTermSize });
         }
-        dlog("resize", `${this.terminal.rows}x${this.terminal.cols}`, `${oldRows}x${oldCols}`, this.hasResized);
+        dlog(
+            "resize",
+            `${newTermSize.rows}x${newTermSize.cols}`,
+            `${oldTermSize.rows}x${oldTermSize.cols}`,
+            this.hasResized
+        );
         if (!this.hasResized) {
             this.hasResized = true;
             this.resyncController("initial resize");
         }
         if (atBottom) {
             setTimeout(() => {
+                console.log("[termwrap] resize scroll-to-bottom");
                 this.cachedAtBottomForResize = null;
                 this.terminal.scrollToBottom();
                 this.setAtBottom(true);
@@ -529,7 +684,7 @@ export class TermWrap {
             return;
         }
         const serializedOutput = this.serializeAddon.serialize();
-        const termSize: TermSize = { rows: this.terminal.rows, cols: this.terminal.cols };
+        const termSize: TermSize = this.getTermSize();
         console.log("idle timeout term", this.dataBytesProcessed, serializedOutput.length, termSize);
         fireAndForget(() =>
             services.BlockService.SaveTerminalState(this.blockId, serializedOutput, "full", this.ptyOffset, termSize)

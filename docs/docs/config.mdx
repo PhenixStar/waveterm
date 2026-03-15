@@ -44,6 +44,7 @@ wsh editconfig
 | app:disablectrlshiftarrows <VersionBadge version="v0.14" />          | bool     | Set to true to disable Ctrl+Shift block-navigation keybindings (`Arrow` and `h/j/k/l`) (defaults to false)                                                                                                                                                    |
 | app:disablectrlshiftdisplay <VersionBadge version="v0.14" />         | bool     | Set to true to disable the Ctrl+Shift visual indicator display (defaults to false)                                                                                                                                                                            |
 | app:focusfollowscursor <VersionBadge version="v0.14" />              | string   | Controls whether block focus follows cursor movement: `"off"` (default), `"on"` (all blocks), or `"term"` (terminal blocks only)                                                                                                                             |
+| app:tabbar <VersionBadge version="v0.14.4" />                        | string   | Controls the position of the tab bar: `"top"` (default) for a horizontal tab bar at the top of the window, or `"left"` for a vertical tab bar on the left side of the window                                                                                |
 | ai:preset                            | string   | the default AI preset to use                                                                                                                                                                                                                                  |
 | ai:baseurl                           | string   | Set the AI Base Url (must be OpenAI compatible)                                                                                                                                                                                                               |
 | ai:apitoken                          | string   | your AI api token                                                                                                                                                                                                                                             |
@@ -73,6 +74,7 @@ wsh editconfig
 | term:cursorblink <VersionBadge version="v0.14" />                   | bool     | when enabled, terminal cursor blinks (default false)                                                                                                                                                                                                          |
 | term:bellsound <VersionBadge version="v0.14" />                      | bool     | when enabled, plays the system beep sound when the terminal bell (BEL character) is received (default false)                                                                                                                                                  |
 | term:bellindicator <VersionBadge version="v0.14" />                  | bool     | when enabled, shows a visual indicator in the tab when the terminal bell is received (default false)                                                                                                                                                           |
+| term:osc52 <VersionBadge version="v0.14" />                          | string   | controls OSC 52 clipboard behavior: `always` (default, allows OSC 52 at any time) or `focus` (requires focused window and focused block)                                                                                                                     |
 | term:durable <VersionBadge version="v0.14" />                        | bool     | makes remote terminal sessions durable across network disconnects (defaults to false)                                                                                                                                                                           |
 | editor:minimapenabled                | bool     | set to false to disable editor minimap                                                                                                                                                                                                                        |
 | editor:stickyscrollenabled           | bool     | enables monaco editor's stickyScroll feature (pinning headers of current context, e.g. class names, method names, etc.), defaults to false                                                                                                                    |
@@ -80,6 +82,7 @@ wsh editconfig
 | editor:fontsize                      | float64  | set the font size for the editor (defaults to 12px)                                                                                                                                                                                                           |
 | editor:inlinediff                    | bool     | set to true to show diffs inline instead of side-by-side, false for side-by-side (defaults to undefined which uses Monaco's responsive behavior)                                                                                                              |
 | preview:showhiddenfiles              | bool     | set to false to disable showing hidden files in the directory preview (defaults to true)                                                                                                                                                                      |
+| preview:defaultsort <VersionBadge version="v0.14.2" />                 | string   | sets the default sort column for directory preview. `"name"` (default) sorts alphabetically by name ascending; `"modtime"` sorts by last modified time descending (newest first)                                                                               |
 | markdown:fontsize                    | float64  | font size for the normal text when rendering markdown in preview. headers are scaled up from this size, (default 14px)                                                                                                                                        |
 | markdown:fixedfontsize               | float64  | font size for the code blocks when rendering markdown in preview (default is 12px)                                                                                                                                                                            |
 | web:openlinksinternally              | bool     | set to false to open web links in external browser                                                                                                                                                                                                            |
@@ -147,12 +150,14 @@ For reference, this is the current default configuration (v0.14.0):
     "telemetry:enabled": true,
     "term:bellsound": false,
     "term:bellindicator": false,
+    "term:osc52": "always",
     "term:cursor": "block",
     "term:cursorblink": false,
     "term:copyonselect": true,
     "term:durable": false,
     "waveai:showcloudmodes": true,
-    "waveai:defaultmode": "waveai@balanced"
+    "waveai:defaultmode": "waveai@balanced",
+    "preview:defaultsort": "name"
 }
 ```
 

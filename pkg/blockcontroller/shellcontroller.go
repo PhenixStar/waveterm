@@ -18,6 +18,7 @@ import (
 
 	"github.com/wavetermdev/waveterm/pkg/blocklogger"
 	"github.com/wavetermdev/waveterm/pkg/filestore"
+	"github.com/wavetermdev/waveterm/pkg/genconn"
 	"github.com/wavetermdev/waveterm/pkg/panichandler"
 	"github.com/wavetermdev/waveterm/pkg/remote"
 	"github.com/wavetermdev/waveterm/pkg/remote/conncontroller"
@@ -42,6 +43,7 @@ const (
 	ConnType_Local = "local"
 	ConnType_Wsl   = "wsl"
 	ConnType_Ssh   = "ssh"
+	ConnType_Mosh  = "mosh"
 )
 
 const (
@@ -320,15 +322,45 @@ func (sc *ShellController) run(logCtx context.Context, bdata *waveobj.Block, blo
 // [Include all the remaining private methods with bc replaced by sc]
 
 type ConnUnion struct {
-	ConnName   string
-	ConnType   string
-	SshConn    *conncontroller.SSHConn
-	WslConn    *wslconn.WslConn
-	WshEnabled bool
-	ShellPath  string
-	ShellOpts  []string
-	ShellType  string
-	HomeDir    string
+	ConnName    string
+	ConnType    string
+	SshConn     *conncontroller.SSHConn
+	WslConn     *wslconn.WslConn
+	WshEnabled  bool
+	MoshEnabled bool
+	MoshActive  bool // true when mosh is actually being used (not just enabled)
+	ShellPath   string
+	ShellOpts   []string
+	ShellType   string
+	HomeDir     string
+}
+
+// autoDetectMosh probes for local mosh-client and remote mosh-server.
+// Result is cached on the SSHConn so the probe only runs once per connection.
+func autoDetectMosh(conn *conncontroller.SSHConn) bool {
+	if conn.MoshAutoDetected.Load() {
+		return conn.MoshAutoAvailable.Load()
+	}
+	// Mark as detected (even if probe fails) to avoid re-probing
+	defer conn.MoshAutoDetected.Store(true)
+
+	// Check local mosh-client
+	if _, err := genconn.FindMoshClientBinary(); err != nil {
+		log.Printf("[mosh-auto] local mosh-client not found: %v\n", err)
+		return false
+	}
+	// Check remote mosh-server
+	client := conn.GetClient()
+	if client == nil {
+		return false
+	}
+	if err := genconn.CheckRemoteMoshServer(client); err != nil {
+		log.Printf("[mosh-auto] remote mosh-server not found on %s: %v\n", conn.GetName(), err)
+		return false
+	}
+	log.Printf("[mosh-auto] mosh available for %s (local client + remote server)\n", conn.GetName())
+	conn.MoshAutoAvailable.Store(true)
+	return true
 }
 
 func (bc *ShellController) getConnUnion(logCtx context.Context, remoteName string, blockMeta waveobj.MetaMapType) (ConnUnion, error) {
@@ -366,6 +398,23 @@ func (bc *ShellController) getConnUnion(logCtx context.Context, remoteName strin
 		rtn.ConnType = ConnType_Ssh
 		rtn.SshConn = conn
 		rtn.WshEnabled = wshEnabled && conn.WshEnabled.Load()
+
+		// Determine mosh enablement: explicit config > block meta > auto-detection
+		connConfig := wconfig.GetWatcher().GetFullConfig()
+		connSettings, connOk := connConfig.Connections[remoteName]
+		explicitlySet := false
+		if connOk && connSettings.ConnMoshEnabled != nil {
+			rtn.MoshEnabled = *connSettings.ConnMoshEnabled
+			explicitlySet = true
+		}
+		if blockMeta.GetBool("conn:moshenabled", false) {
+			rtn.MoshEnabled = true
+			explicitlySet = true
+		}
+		// Auto-detect mosh availability when not explicitly configured
+		if !explicitlySet {
+			rtn.MoshEnabled = autoDetectMosh(conn)
+		}
 	}
 	err := rtn.getRemoteInfoAndShellType(blockMeta)
 	if err != nil {
@@ -459,12 +508,29 @@ func (bc *ShellController) setupAndStartShellProcess(logCtx context.Context, rc 
 		}
 	} else if connUnion.ConnType == ConnType_Ssh {
 		conn := connUnion.SshConn
-		if !connUnion.WshEnabled {
+
+		// Attempt mosh if enabled. Mosh only supports interactive shells (not one-off commands)
+		// because mosh-client requires a PTY and maintains its own terminal state.
+		if connUnion.MoshEnabled && bc.ControllerType == BlockController_Shell {
+			blocklogger.Infof(logCtx, "[conndebug] mosh enabled, attempting mosh connection to %s\n", conn.Opts.SSHHost)
+			moshShellProc, moshErr := shellexec.StartMoshShellProc(ctx, logCtx, rc.TermSize, conn)
+			if moshErr != nil {
+				blocklogger.Infof(logCtx, "[conndebug] mosh failed, falling back to SSH: %v\n", moshErr)
+				bc.writeMutedMessageToTerminal("[mosh unavailable: " + moshErr.Error() + ", using SSH]")
+				// Fall through to normal SSH below
+			} else {
+				blocklogger.Infof(logCtx, "[conndebug] mosh connection established\n")
+				bc.writeMutedMessageToTerminal("[connected via mosh]")
+				shellProc = moshShellProc
+			}
+		}
+
+		if !connUnion.WshEnabled && shellProc == nil {
 			shellProc, err = shellexec.StartRemoteShellProcNoWsh(ctx, rc.TermSize, cmdStr, cmdOpts, conn)
 			if err != nil {
 				return nil, err
 			}
-		} else {
+		} else if shellProc == nil {
 			sockName := conn.GetDomainSocketName()
 			rpcContext := wshrpc.RpcContext{
 				ProcRoute: true,
@@ -647,6 +713,45 @@ func (union *ConnUnion) getRemoteInfoAndShellType(blockMeta waveobj.MetaMapType)
 	return nil
 }
 
+func isLastShellBlockInWorkspace(ctx context.Context, blockId string) bool {
+	tabId, err := wstore.DBFindTabForBlockId(ctx, blockId)
+	if err != nil || tabId == "" {
+		return false
+	}
+	workspaceId, err := wstore.DBFindWorkspaceForTabId(ctx, tabId)
+	if err != nil || workspaceId == "" {
+		return false
+	}
+	workspace, err := wstore.DBGet[*waveobj.Workspace](ctx, workspaceId)
+	if err != nil || workspace == nil {
+		return false
+	}
+	shellBlockCount := 0
+	for _, wsTabId := range workspace.TabIds {
+		tab, err := wstore.DBGet[*waveobj.Tab](ctx, wsTabId)
+		if err != nil {
+			return false
+		}
+		if tab == nil {
+			continue
+		}
+		for _, wsBlockId := range tab.BlockIds {
+			block, err := wstore.DBGet[*waveobj.Block](ctx, wsBlockId)
+			if err != nil {
+				return false
+			}
+			if block == nil {
+				continue
+			}
+			controller := block.Meta.GetString(waveobj.MetaKey_Controller, "")
+			if controller == BlockController_Shell || controller == BlockController_Cmd {
+				shellBlockCount++
+			}
+		}
+	}
+	return shellBlockCount == 1
+}
+
 func checkCloseOnExit(blockId string, exitCode int) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), DefaultTimeout)
 	defer cancelFn()
@@ -657,10 +762,19 @@ func checkCloseOnExit(blockId string, exitCode int) {
 	}
 	closeOnExit := blockData.Meta.GetBool(waveobj.MetaKey_CmdCloseOnExit, false)
 	closeOnExitForce := blockData.Meta.GetBool(waveobj.MetaKey_CmdCloseOnExitForce, false)
+	defaultDelayMs := 2000.0
 	if !closeOnExitForce && !(closeOnExit && exitCode == 0) {
-		return
+		// Check global setting: close when last terminal exits
+		settings := wconfig.GetWatcher().GetFullConfig().Settings
+		if !settings.TermCloseOnLastTermClose {
+			return
+		}
+		if !isLastShellBlockInWorkspace(ctx, blockId) {
+			return
+		}
+		defaultDelayMs = 0
 	}
-	delayMs := blockData.Meta.GetFloat(waveobj.MetaKey_CmdCloseOnExitDelay, 2000)
+	delayMs := blockData.Meta.GetFloat(waveobj.MetaKey_CmdCloseOnExitDelay, defaultDelayMs)
 	if delayMs < 0 {
 		delayMs = 0
 	}
@@ -884,7 +998,7 @@ func updateTermSize(shellProc *shellexec.ShellProc, blockId string, termSize wav
 	if err != nil {
 		log.Printf("error setting pty size: %v\n", err)
 	}
-	err = shellProc.Cmd.SetSize(termSize.Rows, termSize.Cols)
+	err = shellProc.Cmd.SetSize(termSize)
 	if err != nil {
 		log.Printf("error setting pty size: %v\n", err)
 	}

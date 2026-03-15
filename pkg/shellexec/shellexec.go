@@ -21,10 +21,12 @@ import (
 
 	"github.com/creack/pty"
 	"github.com/wavetermdev/waveterm/pkg/blocklogger"
+	"github.com/wavetermdev/waveterm/pkg/genconn"
 	"github.com/wavetermdev/waveterm/pkg/jobcontroller"
 	"github.com/wavetermdev/waveterm/pkg/panichandler"
 	"github.com/wavetermdev/waveterm/pkg/remote/conncontroller"
 	"github.com/wavetermdev/waveterm/pkg/util/pamparse"
+	"github.com/wavetermdev/waveterm/pkg/util/ptyutil"
 	"github.com/wavetermdev/waveterm/pkg/util/shellutil"
 	"github.com/wavetermdev/waveterm/pkg/wavebase"
 	"github.com/wavetermdev/waveterm/pkg/waveobj"
@@ -165,7 +167,7 @@ func StartWslShellProcNoWsh(ctx context.Context, termSize waveobj.TermSize, cmdS
 	if termSize.Rows <= 0 || termSize.Cols <= 0 {
 		return nil, fmt.Errorf("invalid term size: %v", termSize)
 	}
-	cmdPty, err := pty.StartWithSize(ecmd, &pty.Winsize{Rows: uint16(termSize.Rows), Cols: uint16(termSize.Cols)})
+	cmdPty, err := pty.StartWithSize(ecmd, ptyutil.WinsizeFromTermSize(termSize))
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +285,7 @@ func StartWslShellProc(ctx context.Context, termSize waveobj.TermSize, cmdStr st
 		return nil, fmt.Errorf("invalid term size: %v", termSize)
 	}
 	shellutil.AddTokenSwapEntry(cmdOpts.SwapToken)
-	cmdPty, err := pty.StartWithSize(ecmd, &pty.Winsize{Rows: uint16(termSize.Rows), Cols: uint16(termSize.Cols)})
+	cmdPty, err := pty.StartWithSize(ecmd, ptyutil.WinsizeFromTermSize(termSize))
 	if err != nil {
 		return nil, err
 	}
@@ -332,6 +334,54 @@ func StartRemoteShellProcNoWsh(ctx context.Context, termSize waveobj.TermSize, c
 		return nil, err
 	}
 	return &ShellProc{Cmd: sessionWrap, ConnName: conn.GetName(), CloseOnce: &sync.Once{}, DoneCh: make(chan any)}, nil
+}
+
+// StartMoshShellProc starts a mosh-client process that connects to a remote server.
+// SSH is used to start mosh-server, then mosh-client is spawned locally with a PTY.
+// The SSH connection remains alive for wsh features (file ops, RPC).
+func StartMoshShellProc(ctx context.Context, logCtx context.Context, termSize waveobj.TermSize, conn *conncontroller.SSHConn) (*ShellProc, error) {
+	client := conn.GetClient()
+	if client == nil {
+		return nil, fmt.Errorf("ssh client not connected")
+	}
+	conn.Infof(logCtx, "MOSH: Starting mosh shell process\n")
+
+	// Create MoshShellClient and start mosh-server via SSH
+	moshClient := genconn.MakeMoshShellClient(client, conn.Opts.SSHHost)
+
+	// MakeProcessController starts mosh-server via SSH and prepares the local mosh-client command.
+	// It validates remote mosh-server, finds local mosh-client, starts mosh-server,
+	// parses MOSH CONNECT output, and creates the exec.Cmd.
+	moshProc, err := moshClient.MakeProcessController(genconn.CommandSpec{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create mosh process: %w", err)
+	}
+
+	// Extract the underlying exec.Cmd from MoshProcessController
+	moshCtrl, ok := moshProc.(*genconn.MoshProcessController)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mosh process controller type")
+	}
+	ecmd := moshCtrl.GetCmd()
+
+	if termSize.Rows == 0 || termSize.Cols == 0 {
+		termSize.Rows = shellutil.DefaultTermRows
+		termSize.Cols = shellutil.DefaultTermCols
+	}
+	if termSize.Rows <= 0 || termSize.Cols <= 0 {
+		return nil, fmt.Errorf("invalid term size: %v", termSize)
+	}
+
+	// Start mosh-client with a local PTY (same pattern as StartLocalShellProc)
+	cmdPty, err := pty.StartWithSize(ecmd, &pty.Winsize{Rows: uint16(termSize.Rows), Cols: uint16(termSize.Cols)})
+	if err != nil {
+		return nil, fmt.Errorf("failed to start mosh-client with PTY: %w", err)
+	}
+
+	cmdWrap := MakeCmdWrap(ecmd, cmdPty, true)
+	conn.Infof(logCtx, "MOSH: mosh-client started with PTY (pid=%d)\n", ecmd.Process.Pid)
+
+	return &ShellProc{Cmd: cmdWrap, ConnName: conn.GetName(), CloseOnce: &sync.Once{}, DoneCh: make(chan any)}, nil
 }
 
 func StartRemoteShellProc(ctx context.Context, logCtx context.Context, termSize waveobj.TermSize, cmdStr string, cmdOpts CommandOptsType, conn *conncontroller.SSHConn) (*ShellProc, error) {
@@ -684,7 +734,7 @@ func StartLocalShellProc(logCtx context.Context, termSize waveobj.TermSize, cmdS
 		return nil, fmt.Errorf("invalid term size: %v", termSize)
 	}
 	shellutil.AddTokenSwapEntry(cmdOpts.SwapToken)
-	cmdPty, err := pty.StartWithSize(ecmd, &pty.Winsize{Rows: uint16(termSize.Rows), Cols: uint16(termSize.Cols)})
+	cmdPty, err := pty.StartWithSize(ecmd, ptyutil.WinsizeFromTermSize(termSize))
 	if err != nil {
 		return nil, err
 	}
@@ -702,7 +752,7 @@ func RunSimpleCmdInPty(ecmd *exec.Cmd, termSize waveobj.TermSize) ([]byte, error
 	if termSize.Rows <= 0 || termSize.Cols <= 0 {
 		return nil, fmt.Errorf("invalid term size: %v", termSize)
 	}
-	cmdPty, err := pty.StartWithSize(ecmd, &pty.Winsize{Rows: uint16(termSize.Rows), Cols: uint16(termSize.Cols)})
+	cmdPty, err := pty.StartWithSize(ecmd, ptyutil.WinsizeFromTermSize(termSize))
 	if err != nil {
 		cmdPty.Close()
 		return nil, err

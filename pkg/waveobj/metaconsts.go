@@ -89,12 +89,16 @@ const (
 
 	MetaKey_SysinfoType                      = "sysinfo:type"
 
+	MetaKey_TabFlagColor                     = "tab:flagcolor"
+
 	MetaKey_BgClear                          = "bg:*"
 	MetaKey_Bg                               = "bg"
 	MetaKey_BgOpacity                        = "bg:opacity"
 	MetaKey_BgBlendMode                      = "bg:blendmode"
 	MetaKey_BgBorderColor                    = "bg:bordercolor"
 	MetaKey_BgActiveBorderColor              = "bg:activebordercolor"
+
+	MetaKey_LayoutVTabBarWidth               = "layout:vtabbarwidth"
 
 	MetaKey_WaveAiPanelOpen                  = "waveai:panelopen"
 	MetaKey_WaveAiPanelWidth                 = "waveai:panelwidth"
@@ -121,6 +125,7 @@ const (
 	MetaKey_TermConnDebug                    = "term:conndebug"
 	MetaKey_TermBellSound                    = "term:bellsound"
 	MetaKey_TermBellIndicator                = "term:bellindicator"
+	MetaKey_TermOsc52                        = "term:osc52"
 	MetaKey_TermDurable                      = "term:durable"
 
 	MetaKey_WebZoom                          = "web:zoom"

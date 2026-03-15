@@ -17,6 +17,7 @@ const (
 	ConfigKey_AppDisableCtrlShiftArrows      = "app:disablectrlshiftarrows"
 	ConfigKey_AppDisableCtrlShiftDisplay     = "app:disablectrlshiftdisplay"
 	ConfigKey_AppFocusFollowsCursor          = "app:focusfollowscursor"
+	ConfigKey_AppTabBar                      = "app:tabbar"
 
 	ConfigKey_FeatureWaveAppBuilder          = "feature:waveappbuilder"
 
@@ -56,7 +57,9 @@ const (
 	ConfigKey_TermCursorBlink                = "term:cursorblink"
 	ConfigKey_TermBellSound                  = "term:bellsound"
 	ConfigKey_TermBellIndicator              = "term:bellindicator"
+	ConfigKey_TermOsc52                      = "term:osc52"
 	ConfigKey_TermDurable                    = "term:durable"
+	ConfigKey_TermCloseOnLastTermClose       = "term:closeonlasttermclose"
 
 	ConfigKey_EditorMinimapEnabled           = "editor:minimapenabled"
 	ConfigKey_EditorStickyScrollEnabled      = "editor:stickyscrollenabled"
@@ -79,6 +82,7 @@ const (
 	ConfigKey_MarkdownFixedFontSize          = "markdown:fixedfontsize"
 
 	ConfigKey_PreviewShowHiddenFiles         = "preview:showhiddenfiles"
+	ConfigKey_PreviewDefaultSort             = "preview:defaultsort"
 
 	ConfigKey_TabPreset                      = "tab:preset"
 	ConfigKey_TabConfirmClose                = "tab:confirmclose"
@@ -113,6 +117,7 @@ const (
 	ConfigKey_ConnClear                      = "conn:*"
 	ConfigKey_ConnAskBeforeWshInstall        = "conn:askbeforewshinstall"
 	ConfigKey_ConnWshEnabled                 = "conn:wshenabled"
+	ConfigKey_ConnMoshEnabled                = "conn:moshenabled"
 	ConfigKey_ConnLocalHostnameDisplay       = "conn:localhostdisplayname"
 
 	ConfigKey_DebugClear                     = "debug:*"

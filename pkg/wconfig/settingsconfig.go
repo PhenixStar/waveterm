@@ -14,7 +14,9 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"sync"
 
+	"github.com/wavetermdev/waveterm/pkg/util/fileutil"
 	"github.com/wavetermdev/waveterm/pkg/util/utilfn"
 	"github.com/wavetermdev/waveterm/pkg/wavebase"
 	"github.com/wavetermdev/waveterm/pkg/waveobj"
@@ -24,6 +26,8 @@ import (
 const SettingsFile = "settings.json"
 const ConnectionsFile = "connections.json"
 const ProfilesFile = "profiles.json"
+
+var configWriteLock sync.Mutex
 
 const AnySchema = `
 {
@@ -64,6 +68,7 @@ type SettingsType struct {
 	AppDisableCtrlShiftArrows     bool   `json:"app:disablectrlshiftarrows,omitempty"`
 	AppDisableCtrlShiftDisplay    bool   `json:"app:disablectrlshiftdisplay,omitempty"`
 	AppFocusFollowsCursor         string `json:"app:focusfollowscursor,omitempty" jsonschema:"enum=off,enum=on,enum=term"`
+	AppTabBar                     string `json:"app:tabbar,omitempty" jsonschema:"enum=top,enum=left"`
 
 	FeatureWaveAppBuilder bool `json:"feature:waveappbuilder,omitempty"`
 
@@ -103,7 +108,9 @@ type SettingsType struct {
 	TermCursorBlink         *bool    `json:"term:cursorblink,omitempty"`
 	TermBellSound           *bool    `json:"term:bellsound,omitempty"`
 	TermBellIndicator       *bool    `json:"term:bellindicator,omitempty"`
+	TermOsc52               string   `json:"term:osc52,omitempty" jsonschema:"enum=focus,enum=always"`
 	TermDurable             *bool    `json:"term:durable,omitempty"`
+	TermCloseOnLastTermClose bool    `json:"term:closeonlasttermclose,omitempty"`
 
 	EditorMinimapEnabled      bool    `json:"editor:minimapenabled,omitempty"`
 	EditorStickyScrollEnabled bool    `json:"editor:stickyscrollenabled,omitempty"`
@@ -125,7 +132,8 @@ type SettingsType struct {
 	MarkdownFontSize      float64 `json:"markdown:fontsize,omitempty"`
 	MarkdownFixedFontSize float64 `json:"markdown:fixedfontsize,omitempty"`
 
-	PreviewShowHiddenFiles *bool `json:"preview:showhiddenfiles,omitempty"`
+	PreviewShowHiddenFiles *bool  `json:"preview:showhiddenfiles,omitempty"`
+	PreviewDefaultSort     string `json:"preview:defaultsort,omitempty" jsonschema:"enum=name,enum=modtime"`
 
 	TabPreset       string `json:"tab:preset,omitempty"`
 	TabConfirmClose bool   `json:"tab:confirmclose,omitempty"`
@@ -160,6 +168,7 @@ type SettingsType struct {
 	ConnClear                bool    `json:"conn:*,omitempty"`
 	ConnAskBeforeWshInstall  *bool   `json:"conn:askbeforewshinstall,omitempty"`
 	ConnWshEnabled           bool    `json:"conn:wshenabled,omitempty"`
+	ConnMoshEnabled          bool    `json:"conn:moshenabled,omitempty"`
 	ConnLocalHostnameDisplay *string `json:"conn:localhostdisplayname,omitempty"`
 
 	DebugClear               bool `json:"debug:*,omitempty"`
@@ -284,6 +293,7 @@ type AIModeConfigType struct {
 	ThinkingLevel      string   `json:"ai:thinkinglevel,omitempty" jsonschema:"enum=low,enum=medium,enum=high"`
 	Verbosity          string   `json:"ai:verbosity,omitempty" jsonschema:"enum=low,enum=medium,enum=high,description=Text verbosity level (OpenAI Responses API only)"`
 	Endpoint           string   `json:"ai:endpoint,omitempty"`
+	ProxyURL           string   `json:"ai:proxyurl,omitempty"`
 	AzureAPIVersion    string   `json:"ai:azureapiversion,omitempty"`
 	APIToken           string   `json:"ai:apitoken,omitempty"`
 	APITokenSecretName string   `json:"ai:apitokensecretname,omitempty"`
@@ -316,6 +326,7 @@ type ConnKeywords struct {
 	ConnWshEnabled          *bool  `json:"conn:wshenabled,omitempty"`
 	ConnAskBeforeWshInstall *bool  `json:"conn:askbeforewshinstall,omitempty"`
 	ConnWshPath             string `json:"conn:wshpath,omitempty"`
+	ConnMoshEnabled         *bool  `json:"conn:moshenabled,omitempty"`
 	ConnShellPath           string `json:"conn:shellpath,omitempty"`
 	ConnIgnoreSshConfig     *bool  `json:"conn:ignoresshconfig,omitempty"`
 
@@ -502,13 +513,16 @@ func ReadWaveHomeConfigFile(fileName string) (waveobj.MetaMapType, []ConfigError
 }
 
 func WriteWaveHomeConfigFile(fileName string, m waveobj.MetaMapType) error {
+	configWriteLock.Lock()
+	defer configWriteLock.Unlock()
+
 	configDirAbsPath := wavebase.GetWaveConfigDir()
 	fullFileName := filepath.Join(configDirAbsPath, fileName)
 	barr, err := jsonMarshalConfigInOrder(m)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(fullFileName, barr, 0644)
+	return fileutil.AtomicWriteFile(fullFileName, barr, 0644)
 }
 
 // simple merge that overwrites

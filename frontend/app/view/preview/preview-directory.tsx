@@ -1,9 +1,9 @@
-// Copyright 2025, Command Line Inc.
+// Copyright 2026, Command Line Inc.
 // SPDX-License-Identifier: Apache-2.0
 
 import { ContextMenuModel } from "@/app/store/contextmenu";
-import { atoms, getApi, globalStore } from "@/app/store/global";
-import { RpcApi } from "@/app/store/wshclientapi";
+import { useWaveEnv } from "@/app/waveenv/waveenv";
+import { globalStore } from "@/app/store/jotaiStore";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { checkKeyPressed, isCharacterKeyEvent } from "@/util/keyutil";
 import { PLATFORM, PlatformMacOS } from "@/util/platformutil";
@@ -39,10 +39,12 @@ import {
     handleFileDelete,
     handleRename,
     isIconValid,
+    makeDirectoryDefaultMenuItems,
     mergeError,
     overwriteError,
 } from "./preview-directory-utils";
 import { type PreviewModel } from "./preview-model";
+import type { PreviewEnv } from "./previewenv";
 
 const PageJumpSize = 20;
 
@@ -109,8 +111,10 @@ function DirectoryTable({
     newFile,
     newDirectory,
 }: DirectoryTableProps) {
+    const env = useWaveEnv<PreviewEnv>();
     const searchActive = useAtomValue(model.directorySearchActive);
-    const fullConfig = useAtomValue(atoms.fullConfigAtom);
+    const fullConfig = useAtomValue(env.atoms.fullConfigAtom);
+    const defaultSort = useAtomValue(env.getSettingsKeyAtom("preview:defaultsort")) ?? "name";
     const setErrorMsg = useSetAtom(model.errorMsgAtom);
     const getIconFromMimeType = useCallback(
         (mimeType: string): string => {
@@ -158,9 +162,7 @@ function DirectoryTable({
                 sortingFn: "alphanumeric",
             }),
             columnHelper.accessor("modtime", {
-                cell: (info) => (
-                    <span className="dir-table-lastmod">{getLastModifiedTime(info.getValue(), info.column)}</span>
-                ),
+                cell: (info) => <span className="dir-table-lastmod">{getLastModifiedTime(info.getValue())}</span>,
                 header: () => <span>Last Modified</span>,
                 size: 91,
                 minSize: 65,
@@ -208,6 +210,8 @@ function DirectoryTable({
         [model, setErrorMsg]
     );
 
+    const initialSorting = defaultSort === "modtime" ? [{ id: "modtime", desc: true }] : [{ id: "name", desc: false }];
+
     const table = useReactTable({
         data,
         columns,
@@ -216,12 +220,7 @@ function DirectoryTable({
         getCoreRowModel: getCoreRowModel(),
 
         initialState: {
-            sorting: [
-                {
-                    id: "name",
-                    desc: false,
-                },
-            ],
+            sorting: initialSorting,
             columnVisibility: {
                 path: false,
             },
@@ -415,6 +414,13 @@ function TableBody({
                     type: "separator",
                 },
                 {
+                    label: "Default Settings",
+                    submenu: makeDirectoryDefaultMenuItems(model),
+                },
+                {
+                    type: "separator",
+                },
+                {
                     label: "Delete",
                     click: () => handleFileDelete(model, finfo.path, false, setErrorMsg),
                 }
@@ -493,15 +499,7 @@ type TableRowProps = {
     handleFileContextMenu: (e: any, finfo: FileInfo) => Promise<void>;
 };
 
-const TableRow = React.forwardRef(function ({
-    model,
-    row,
-    focusIndex,
-    setFocusIndex,
-    setSearch,
-    idx,
-    handleFileContextMenu,
-}: TableRowProps) {
+function TableRow({ model, row, focusIndex, setFocusIndex, setSearch, idx, handleFileContextMenu }: TableRowProps) {
     const dirPath = useAtomValue(model.statFilePath);
     const connection = useAtomValue(model.connection);
 
@@ -552,7 +550,7 @@ const TableRow = React.forwardRef(function ({
             ))}
         </div>
     );
-});
+}
 
 const MemoizedTableBody = React.memo(
     TableBody,
@@ -564,6 +562,7 @@ interface DirectoryPreviewProps {
 }
 
 function DirectoryPreview({ model }: DirectoryPreviewProps) {
+    const env = useWaveEnv<PreviewEnv>();
     const [searchText, setSearchText] = useState("");
     const [focusIndex, setFocusIndex] = useState(0);
     const [unfilteredData, setUnfilteredData] = useState<FileInfo[]>([]);
@@ -590,7 +589,7 @@ function DirectoryPreview({ model }: DirectoryPreviewProps) {
             fireAndForget(async () => {
                 let entries: FileInfo[];
                 try {
-                    const file = await RpcApi.FileReadCommand(
+                    const file = await env.rpc.FileReadCommand(
                         TabRpcClient,
                         {
                             info: {
@@ -684,7 +683,7 @@ function DirectoryPreview({ model }: DirectoryPreviewProps) {
                 PLATFORM == PlatformMacOS &&
                 !blockData?.meta?.connection
             ) {
-                getApi().onQuicklook(selectedPath);
+                env.electron.onQuicklook(selectedPath);
                 return true;
             }
             if (isCharacterKeyEvent(waveEvent)) {
@@ -718,7 +717,7 @@ function DirectoryPreview({ model }: DirectoryPreviewProps) {
     const handleDropCopy = useCallback(
         async (data: CommandFileCopyData, isDir: boolean) => {
             try {
-                await RpcApi.FileCopyCommand(TabRpcClient, data, { timeout: data.opts.timeout });
+                await env.rpc.FileCopyCommand(TabRpcClient, data, { timeout: data.opts.timeout });
             } catch (e) {
                 console.warn("Copy failed:", e);
                 const copyError = `${e}`;
@@ -805,7 +804,7 @@ function DirectoryPreview({ model }: DirectoryPreviewProps) {
             onSave: (newName: string) => {
                 console.log(`newFile: ${newName}`);
                 fireAndForget(async () => {
-                    await RpcApi.FileCreateCommand(
+                    await env.rpc.FileCreateCommand(
                         TabRpcClient,
                         {
                             info: {
@@ -826,7 +825,7 @@ function DirectoryPreview({ model }: DirectoryPreviewProps) {
             onSave: (newName: string) => {
                 console.log(`newDirectory: ${newName}`);
                 fireAndForget(async () => {
-                    await RpcApi.FileMkdirCommand(TabRpcClient, {
+                    await env.rpc.FileMkdirCommand(TabRpcClient, {
                         info: {
                             path: await model.formatRemoteUri(`${dirPath}/${newName}`, globalStore.get),
                         },

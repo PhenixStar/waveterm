@@ -343,6 +343,8 @@ func startupActivityUpdate(firstLaunch bool) {
 			ClientArch:          wavebase.ClientArch(),
 			ClientOSRelease:     wavebase.UnameKernelRelease(),
 			ClientIsDev:         wavebase.IsDevMode(),
+			ClientPackageType:   wavebase.ClientPackageType(),
+			ClientMacOSVersion:  wavebase.ClientMacOSVersion(),
 			AutoUpdateChannel:   autoUpdateChannel,
 			AutoUpdateEnabled:   autoUpdateEnabled,
 			LocalShellType:      shellType,
@@ -571,7 +573,11 @@ func main() {
 	blocklogger.InitBlockLogger()
 	jobcontroller.InitJobController()
 	blockcontroller.InitBlockController()
-	wcore.InitTabIndicatorStore()
+	err = wcore.InitBadgeStore()
+	if err != nil {
+		log.Printf("error initializing badge store: %v\n", err)
+		return
+	}
 	go func() {
 		defer func() {
 			panichandler.PanicHandler("GetSystemSummary", recover())

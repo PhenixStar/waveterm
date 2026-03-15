@@ -16,11 +16,13 @@ import {
     setWasInFg,
 } from "./emain-activity";
 import { log } from "./emain-log";
-import { getElectronAppBasePath, unamePlatform } from "./emain-platform";
+import { getElectronAppBasePath, isDev, unamePlatform } from "./emain-platform";
 import { getOrCreateWebViewForTab, getWaveTabViewByWebContentsId, WaveTabView } from "./emain-tabview";
 import { delay, ensureBoundsAreVisible, waveKeyToElectronKey } from "./emain-util";
 import { ElectronWshClient } from "./emain-wsh";
 import { updater } from "./updater";
+
+const DevInitTimeoutMs = 5000;
 
 export type WindowOpts = {
     unamePlatform: NodeJS.Platform;
@@ -138,6 +140,7 @@ export class WaveBrowserWindow extends BaseWindow {
     waveWindowId: string;
     workspaceId: string;
     allLoadedTabViews: Map<string, WaveTabView>;
+    allTabViewsCache: Map<string, WaveTabView>; // Cache for preserving tab views across workspace switches
     activeTabView: WaveTabView;
     private canClose: boolean;
     private deleteAllowed: boolean;
@@ -217,6 +220,7 @@ export class WaveBrowserWindow extends BaseWindow {
         this.waveWindowId = waveWindow.oid;
         this.workspaceId = waveWindow.workspaceid;
         this.allLoadedTabViews = new Map<string, WaveTabView>();
+        this.allTabViewsCache = new Map<string, WaveTabView>();
         const winBoundsPoller = setInterval(() => {
             if (this.isDestroyed()) {
                 clearInterval(winBoundsPoller);
@@ -271,6 +275,7 @@ export class WaveBrowserWindow extends BaseWindow {
             if (getGlobalIsRelaunching()) {
                 return;
             }
+            focusedWaveWindow = this; // eslint-disable-line @typescript-eslint/no-this-alias
             console.log("focus win", this.waveWindowId);
             fireAndForget(() => ClientService.FocusWindow(this.waveWindowId));
             setWasInFg(true);
@@ -350,6 +355,11 @@ export class WaveBrowserWindow extends BaseWindow {
             }
             tabView?.destroy();
         }
+        // Also destroy any cached views
+        for (const tabView of this.allTabViewsCache.values()) {
+            tabView?.destroy();
+        }
+        this.allTabViewsCache.clear();
     }
 
     async switchWorkspace(workspaceId: string) {
@@ -389,7 +399,7 @@ export class WaveBrowserWindow extends BaseWindow {
 
     private async initializeTab(tabView: WaveTabView, primaryStartupTab: boolean) {
         const clientId = await getClientId();
-        await tabView.initPromise;
+        await this.awaitWithDevTimeout(tabView.initPromise, "initPromise", tabView.waveTabId);
         this.contentView.addChildView(tabView);
         const initOpts: WaveInitOpts = {
             tabId: tabView.waveTabId,
@@ -410,8 +420,34 @@ export class WaveBrowserWindow extends BaseWindow {
             primaryStartupTab ? "(primary startup)" : ""
         );
         tabView.webContents.send("wave-init", initOpts);
-        await tabView.waveReadyPromise;
+        await this.awaitWithDevTimeout(tabView.waveReadyPromise, "waveReadyPromise", tabView.waveTabId);
         console.log("wave-ready init time", Date.now() - startTime + "ms");
+    }
+
+    private async awaitWithDevTimeout<T>(promise: Promise<T>, name: string, tabId: string): Promise<T> {
+        if (!isDev) {
+            return promise;
+        }
+        let timeoutHandle: ReturnType<typeof setTimeout> = null;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+            timeoutHandle = setTimeout(() => {
+                console.log(
+                    `[dev] ${name} timed out after ${DevInitTimeoutMs}ms for tab ${tabId}, showing window for devtools`
+                );
+                if (!this.isDestroyed() && !this.isVisible()) {
+                    this.show();
+                }
+                if (this.activeTabView?.webContents && !this.activeTabView.webContents.isDevToolsOpened()) {
+                    this.activeTabView.webContents.openDevTools();
+                }
+                reject(new Error(`[dev] ${name} timed out after ${DevInitTimeoutMs}ms`));
+            }, DevInitTimeoutMs);
+        });
+        try {
+            return await Promise.race([promise, timeoutPromise]);
+        } finally {
+            clearTimeout(timeoutHandle);
+        }
     }
 
     private async setTabViewIntoWindow(tabView: WaveTabView, tabInitialized: boolean, primaryStartupTab = false) {
@@ -575,8 +611,31 @@ export class WaveBrowserWindow extends BaseWindow {
                             return;
                         }
                         console.log("processActionQueue switchworkspace newWs", newWs);
-                        this.removeAllChildViews();
-                        console.log("destroyed all tabs", this.waveWindowId);
+                        // Move current tab views to cache instead of destroying them
+                        // This preserves terminal state (including alternate screen mode) across workspace switches
+                        for (const [tabId, tabView] of this.allLoadedTabViews.entries()) {
+                            if (!this.isDestroyed()) {
+                                this.contentView.removeChildView(tabView);
+                            }
+                            // If tabId already in cache (edge case with rapid workspace switching), destroy the old cached view first
+                            const existingCachedView = this.allTabViewsCache.get(tabId);
+                            if (existingCachedView) {
+                                existingCachedView.destroy();
+                            }
+                            this.allTabViewsCache.set(tabId, tabView);
+                        }
+                        console.log(
+                            "cached",
+                            this.allLoadedTabViews.size,
+                            "tabs for workspace",
+                            this.workspaceId,
+                            this.waveWindowId
+                        );
+                        // Note: Cached views are kept alive indefinitely and only destroyed when:
+                        // 1. The tab is explicitly closed by the user
+                        // 2. The window is closed (via removeAllChildViews)
+                        // This matches how traditional terminal apps work and prevents terminal state loss
+
                         this.workspaceId = entry.workspaceId;
                         this.allLoadedTabViews = new Map();
                         tabId = newWs.activetabid;
@@ -586,7 +645,18 @@ export class WaveBrowserWindow extends BaseWindow {
                 if (tabId == null) {
                     return;
                 }
-                const [tabView, tabInitialized] = await getOrCreateWebViewForTab(this.waveWindowId, tabId);
+                // Check cache first to reuse existing tab views across workspace switches
+                let tabView = this.allTabViewsCache.get(tabId);
+                let tabInitialized = true;
+                if (tabView) {
+                    console.log("reusing cached tab view", tabId, this.waveWindowId);
+                    this.allTabViewsCache.delete(tabId);
+                    if (!this.isDestroyed()) {
+                        this.contentView.addChildView(tabView);
+                    }
+                } else {
+                    [tabView, tabInitialized] = await getOrCreateWebViewForTab(this.waveWindowId, tabId);
+                }
                 const primaryStartupTabFlag = entry.op === "switchtab" ? (entry.primaryStartupTab ?? false) : false;
                 await this.setTabViewIntoWindow(tabView, tabInitialized, primaryStartupTabFlag);
             } catch (e) {
@@ -618,14 +688,20 @@ export class WaveBrowserWindow extends BaseWindow {
             console.log("cannot remove active tab", tabId, this.waveWindowId);
             return;
         }
-        const tabView = this.allLoadedTabViews.get(tabId);
+        let tabView = this.allLoadedTabViews.get(tabId);
         if (tabView == null) {
-            console.log("removeTabView -- tabView not found", tabId, this.waveWindowId);
-            // the tab was never loaded, so just return
-            return;
+            // Check cache - tab might be from a different workspace
+            tabView = this.allTabViewsCache.get(tabId);
+            if (tabView == null) {
+                console.log("removeTabView -- tabView not found in loaded or cache", tabId, this.waveWindowId);
+                return;
+            }
+            console.log("removeTabView -- removing from cache", tabId, this.waveWindowId);
+            this.allTabViewsCache.delete(tabId);
+        } else {
+            this.contentView.removeChildView(tabView);
+            this.allLoadedTabViews.delete(tabId);
         }
-        this.contentView.removeChildView(tabView);
-        this.allLoadedTabViews.delete(tabId);
         tabView.destroy();
     }
 
@@ -638,13 +714,16 @@ export class WaveBrowserWindow extends BaseWindow {
 
 export function getWaveWindowByTabId(tabId: string): WaveBrowserWindow {
     for (const ww of waveWindowMap.values()) {
-        if (ww.allLoadedTabViews.has(tabId)) {
+        if (ww.allLoadedTabViews.has(tabId) || ww.allTabViewsCache.has(tabId)) {
             return ww;
         }
     }
 }
 
 export function getWaveWindowByWebContentsId(webContentsId: number): WaveBrowserWindow {
+    if (webContentsId == null) {
+        return null;
+    }
     const tabView = getWaveTabViewByWebContentsId(webContentsId);
     if (tabView == null) {
         return null;

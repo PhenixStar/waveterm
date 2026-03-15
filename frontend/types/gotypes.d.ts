@@ -25,6 +25,7 @@ declare global {
         "ai:thinkinglevel"?: string;
         "ai:verbosity"?: string;
         "ai:endpoint"?: string;
+        "ai:proxyurl"?: string;
         "ai:azureapiversion"?: string;
         "ai:apitoken"?: string;
         "ai:apitokensecretname"?: string;
@@ -105,6 +106,24 @@ declare global {
         shortdesc: string;
         icon: string;
         iconcolor: string;
+    };
+
+    // baseds.Badge
+    type Badge = {
+        badgeid: string;
+        icon: string;
+        color?: string;
+        priority: number;
+        pidlinked?: boolean;
+    };
+
+    // baseds.BadgeEvent
+    type BadgeEvent = {
+        oref: string;
+        clear?: boolean;
+        clearall?: boolean;
+        clearbyid?: string;
+        badge?: Badge;
     };
 
     // waveobj.Block
@@ -220,6 +239,13 @@ declare global {
         token: string;
     };
 
+    // wshrpc.CommandBadgeWatchPidData
+    type CommandBadgeWatchPidData = {
+        pid: number;
+        oref: ORef;
+        badgeid: string;
+    };
+
     // wshrpc.CommandBlockInputData
     type CommandBlockInputData = {
         blockid: string;
@@ -276,6 +302,18 @@ declare global {
     type CommandCreateSubBlockData = {
         parentblockid: string;
         blockdef: BlockDef;
+    };
+
+    // wshrpc.CommandDebugTermData
+    type CommandDebugTermData = {
+        blockid: string;
+        size: number;
+    };
+
+    // wshrpc.CommandDebugTermRtnData
+    type CommandDebugTermRtnData = {
+        offset: number;
+        data64: string;
     };
 
     // wshrpc.CommandDeleteAppFileData
@@ -747,6 +785,7 @@ declare global {
         "conn:wshenabled"?: boolean;
         "conn:askbeforewshinstall"?: boolean;
         "conn:wshpath"?: string;
+        "conn:moshenabled"?: boolean;
         "conn:shellpath"?: string;
         "conn:ignoresshconfig"?: boolean;
         "display:hidden"?: boolean;
@@ -793,6 +832,8 @@ declare global {
         status: string;
         connhealthstatus?: string;
         wshenabled: boolean;
+        moshenabled: boolean;
+        moshactive: boolean;
         connection: string;
         connected: boolean;
         hasconnected: boolean;
@@ -1076,12 +1117,14 @@ declare global {
         "graph:numpoints"?: number;
         "graph:metrics"?: string[];
         "sysinfo:type"?: string;
+        "tab:flagcolor"?: string;
         "bg:*"?: boolean;
         bg?: string;
         "bg:opacity"?: number;
         "bg:blendmode"?: string;
         "bg:bordercolor"?: string;
         "bg:activebordercolor"?: string;
+        "layout:vtabbarwidth"?: number;
         "waveai:panelopen"?: boolean;
         "waveai:panelwidth"?: number;
         "waveai:model"?: string;
@@ -1106,6 +1149,7 @@ declare global {
         "term:conndebug"?: string;
         "term:bellsound"?: boolean;
         "term:bellindicator"?: boolean;
+        "term:osc52"?: string;
         "term:durable"?: boolean;
         "web:zoom"?: number;
         "web:hidenav"?: boolean;
@@ -1157,7 +1201,8 @@ declare global {
         "shell:integration"?: boolean;
         "shell:omz"?: boolean;
         "shell:comp"?: string;
-        "shell:inputempty"?: boolean;
+        "shell:inputbuffer64"?: string;
+        "shell:inputcursor"?: number;
         "shell:lastcmd"?: string;
         "shell:lastcmdexitcode"?: number;
         "builder:layout"?: {[key: string]: number};
@@ -1265,6 +1310,7 @@ declare global {
         "app:disablectrlshiftarrows"?: boolean;
         "app:disablectrlshiftdisplay"?: boolean;
         "app:focusfollowscursor"?: string;
+        "app:tabbar"?: string;
         "feature:waveappbuilder"?: boolean;
         "ai:*"?: boolean;
         "ai:preset"?: string;
@@ -1300,7 +1346,9 @@ declare global {
         "term:cursorblink"?: boolean;
         "term:bellsound"?: boolean;
         "term:bellindicator"?: boolean;
+        "term:osc52"?: string;
         "term:durable"?: boolean;
+        "term:closeonlasttermclose"?: boolean;
         "editor:minimapenabled"?: boolean;
         "editor:stickyscrollenabled"?: boolean;
         "editor:wordwrap"?: boolean;
@@ -1318,6 +1366,7 @@ declare global {
         "markdown:fontsize"?: number;
         "markdown:fixedfontsize"?: number;
         "preview:showhiddenfiles"?: boolean;
+        "preview:defaultsort"?: string;
         "tab:preset"?: string;
         "tab:confirmclose"?: boolean;
         "widget:*"?: boolean;
@@ -1347,6 +1396,7 @@ declare global {
         "conn:*"?: boolean;
         "conn:askbeforewshinstall"?: boolean;
         "conn:wshenabled"?: boolean;
+        "conn:moshenabled"?: boolean;
         "conn:localhostdisplayname"?: string;
         "debug:*"?: boolean;
         "debug:pprofport"?: number;
@@ -1429,6 +1479,8 @@ declare global {
         "client:buildtime"?: string;
         "client:osrelease"?: string;
         "client:isdev"?: boolean;
+        "client:packagetype"?: string;
+        "client:macos"?: string;
         "cohort:month"?: string;
         "cohort:isoweek"?: string;
         "autoupdate:channel"?: string;
@@ -1471,6 +1523,7 @@ declare global {
         "onboarding:feature"?: "waveai" | "durable" | "magnify" | "wsh";
         "onboarding:version"?: string;
         "onboarding:githubstar"?: "already" | "star" | "later";
+        "onboarding:page"?: string;
         "display:height"?: number;
         "display:width"?: number;
         "display:dpr"?: number;
@@ -1526,6 +1579,8 @@ declare global {
         "client:buildtime"?: string;
         "client:osrelease"?: string;
         "client:isdev"?: boolean;
+        "client:packagetype"?: string;
+        "client:macos"?: string;
         "cohort:month"?: string;
         "cohort:isoweek"?: string;
         "autoupdate:channel"?: string;
@@ -1549,25 +1604,12 @@ declare global {
         blockids: string[];
     };
 
-    // wshrpc.TabIndicator
-    type TabIndicator = {
-        icon: string;
-        color?: string;
-        priority: number;
-        clearonfocus?: boolean;
-        persistentindicator?: TabIndicator;
-    };
-
-    // wshrpc.TabIndicatorEventData
-    type TabIndicatorEventData = {
-        tabid: string;
-        indicator: TabIndicator;
-    };
-
     // waveobj.TermSize
     type TermSize = {
         rows: number;
         cols: number;
+        xpixel?: number;
+        ypixel?: number;
     };
 
     // wconfig.TermThemeType

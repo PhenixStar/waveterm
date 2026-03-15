@@ -18,6 +18,7 @@ import (
 
 	"github.com/wavetermdev/waveterm/pkg/blocklogger"
 	"github.com/wavetermdev/waveterm/pkg/filestore"
+	"github.com/wavetermdev/waveterm/pkg/genconn"
 	"github.com/wavetermdev/waveterm/pkg/panichandler"
 	"github.com/wavetermdev/waveterm/pkg/remote"
 	"github.com/wavetermdev/waveterm/pkg/remote/conncontroller"
@@ -334,6 +335,34 @@ type ConnUnion struct {
 	HomeDir     string
 }
 
+// autoDetectMosh probes for local mosh-client and remote mosh-server.
+// Result is cached on the SSHConn so the probe only runs once per connection.
+func autoDetectMosh(conn *conncontroller.SSHConn) bool {
+	if conn.MoshAutoDetected.Load() {
+		return conn.MoshAutoAvailable.Load()
+	}
+	// Mark as detected (even if probe fails) to avoid re-probing
+	defer conn.MoshAutoDetected.Store(true)
+
+	// Check local mosh-client
+	if _, err := genconn.FindMoshClientBinary(); err != nil {
+		log.Printf("[mosh-auto] local mosh-client not found: %v\n", err)
+		return false
+	}
+	// Check remote mosh-server
+	client := conn.GetClient()
+	if client == nil {
+		return false
+	}
+	if err := genconn.CheckRemoteMoshServer(client); err != nil {
+		log.Printf("[mosh-auto] remote mosh-server not found on %s: %v\n", conn.GetName(), err)
+		return false
+	}
+	log.Printf("[mosh-auto] mosh available for %s (local client + remote server)\n", conn.GetName())
+	conn.MoshAutoAvailable.Store(true)
+	return true
+}
+
 func (bc *ShellController) getConnUnion(logCtx context.Context, remoteName string, blockMeta waveobj.MetaMapType) (ConnUnion, error) {
 	rtn := ConnUnion{ConnName: remoteName}
 	wshEnabled := !blockMeta.GetBool(waveobj.MetaKey_CmdNoWsh, false)
@@ -370,15 +399,21 @@ func (bc *ShellController) getConnUnion(logCtx context.Context, remoteName strin
 		rtn.SshConn = conn
 		rtn.WshEnabled = wshEnabled && conn.WshEnabled.Load()
 
-		// Check if mosh is enabled for this connection
+		// Determine mosh enablement: explicit config > block meta > auto-detection
 		connConfig := wconfig.GetWatcher().GetFullConfig()
 		connSettings, connOk := connConfig.Connections[remoteName]
-		if connOk && connSettings.ConnMoshEnabled != nil && *connSettings.ConnMoshEnabled {
-			rtn.MoshEnabled = true
+		explicitlySet := false
+		if connOk && connSettings.ConnMoshEnabled != nil {
+			rtn.MoshEnabled = *connSettings.ConnMoshEnabled
+			explicitlySet = true
 		}
-		// Also check block-level meta override
 		if blockMeta.GetBool("conn:moshenabled", false) {
 			rtn.MoshEnabled = true
+			explicitlySet = true
+		}
+		// Auto-detect mosh availability when not explicitly configured
+		if !explicitlySet {
+			rtn.MoshEnabled = autoDetectMosh(conn)
 		}
 	}
 	err := rtn.getRemoteInfoAndShellType(blockMeta)

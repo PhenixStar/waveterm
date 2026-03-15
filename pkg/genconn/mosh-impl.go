@@ -46,13 +46,13 @@ func MakeMoshShellClient(sshClient *ssh.Client, remoteHost string) *MoshShellCli
 func (c *MoshShellClient) MakeProcessController(cmdSpec CommandSpec) (ShellProcessController, error) {
 	// First check if mosh-server is available on remote
 	log.Printf("MOSH: Checking for remote mosh-server\n")
-	if err := checkRemoteMoshServer(c.sshClient); err != nil {
+	if err := CheckRemoteMoshServer(c.sshClient); err != nil {
 		return nil, fmt.Errorf("mosh-server not available on %s: %w", c.remoteHost, err)
 	}
 
 	// Find local mosh-client binary
 	log.Printf("MOSH: Finding local mosh-client binary\n")
-	moshClientPath, err := findMoshClientBinary()
+	moshClientPath, err := FindMoshClientBinary()
 	if err != nil {
 		return nil, fmt.Errorf("mosh-client not found on local machine (remote: %s): %w", c.remoteHost, err)
 	}
@@ -237,9 +237,10 @@ func ParseMoshConnectLine(output string) (string, string, error) {
 	return port, key, nil
 }
 
-// findMoshClientBinary finds the mosh-client binary on the local system
-// Checks: PATH, then platform-specific paths
-func findMoshClientBinary() (string, error) {
+// FindMoshClientBinary finds the mosh-client binary on the local system
+// Checks: PATH, then platform-specific paths.
+// Exported for auto-detection probing from shellcontroller.
+func FindMoshClientBinary() (string, error) {
 	// First try to find in PATH
 	path, err := exec.LookPath("mosh-client")
 	if err == nil {
@@ -299,8 +300,9 @@ func findMoshClientBinary() (string, error) {
 	return "", fmt.Errorf("mosh-client binary not found in PATH or common locations")
 }
 
-// checkRemoteMoshServer checks if mosh-server is available on remote via SSH
-func checkRemoteMoshServer(client *ssh.Client) error {
+// CheckRemoteMoshServer checks if mosh-server is available on remote via SSH.
+// Exported so that auto-detection logic in shellcontroller can probe without starting a full mosh session.
+func CheckRemoteMoshServer(client *ssh.Client) error {
 	session, err := client.NewSession()
 	if err != nil {
 		return fmt.Errorf("failed to create SSH session: %w", err)

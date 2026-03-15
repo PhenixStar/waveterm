@@ -203,13 +203,13 @@ func TestFindMoshClientBinary(t *testing.T) {
 		pathMosh, pathErr := exec.LookPath("mosh-client")
 		if pathErr == nil {
 			// mosh-client is available in PATH
-			foundPath, err := findMoshClientBinary()
+			foundPath, err := FindMoshClientBinary()
 			if err != nil {
-				t.Errorf("findMoshClientBinary() error = %v, expected to find mosh-client at %s", err, pathMosh)
+				t.Errorf("FindMoshClientBinary() error = %v, expected to find mosh-client at %s", err, pathMosh)
 				return
 			}
 			if foundPath == "" {
-				t.Error("findMoshClientBinary() returned empty path when mosh-client is in PATH")
+				t.Error("FindMoshClientBinary() returned empty path when mosh-client is in PATH")
 			}
 			t.Logf("Found mosh-client at: %s", foundPath)
 		} else {
@@ -247,7 +247,7 @@ func TestFindMoshClientBinary(t *testing.T) {
 
 		// The function won't find our temp binary since it's not in the hardcoded paths,
 		// but we can verify the function runs without panicking
-		_, err = findMoshClientBinary()
+		_, err = FindMoshClientBinary()
 		// We expect an error if mosh-client is not installed system-wide
 		if err == nil {
 			t.Log("mosh-client found on system")
@@ -263,7 +263,7 @@ func TestFindMoshClientBinary(t *testing.T) {
 		os.Setenv("PATH", "")
 		defer os.Setenv("PATH", originalPath)
 
-		_, err := findMoshClientBinary()
+		_, err := FindMoshClientBinary()
 		if err == nil {
 			// If no error, mosh-client was found in hardcoded paths
 			t.Log("mosh-client found in hardcoded paths")

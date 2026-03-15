@@ -82,6 +82,8 @@ type SSHConn struct {
 	WshEnabled         *atomic.Bool
 	MoshEnabled        *atomic.Bool
 	MoshActive         *atomic.Bool // true when mosh is actively used for shell I/O
+	MoshAutoDetected   *atomic.Bool // true after auto-detection probe has run
+	MoshAutoAvailable  *atomic.Bool // true if both local mosh-client and remote mosh-server were found
 	Opts               *remote.SSHOpts
 	Client             *ssh.Client
 	DomainSockName     string // if "", then no domain socket
@@ -1079,8 +1081,10 @@ func getConnInternal(opts *remote.SSHOpts, createIfNotExists bool) *SSHConn {
 			Status:           Status_Init,
 			ConnHealthStatus: ConnHealthStatus_Good,
 			WshEnabled:       &atomic.Bool{},
-			MoshEnabled:      &atomic.Bool{},
-			MoshActive:       &atomic.Bool{},
+			MoshEnabled:       &atomic.Bool{},
+			MoshActive:        &atomic.Bool{},
+			MoshAutoDetected:  &atomic.Bool{},
+			MoshAutoAvailable: &atomic.Bool{},
 			Opts:             opts,
 		}
 		clientControllerMap[*opts] = rtn

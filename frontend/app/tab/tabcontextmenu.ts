@@ -40,7 +40,8 @@ export function buildTabContextMenu(
     id: string,
     renameRef: React.RefObject<(() => void) | null>,
     onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null) => void,
-    env: TabEnv
+    env: TabEnv,
+    connList: string[] = []
 ): ContextMenuItem[] {
     const menu: ContextMenuItem[] = [];
     menu.push(
@@ -74,6 +75,29 @@ export function buildTabContextMenu(
         })),
     ];
     menu.push({ label: "Flag Tab", type: "submenu", submenu: flagSubmenu }, { type: "separator" });
+    const currentConn = globalStore.get(getOrefMetaKeyAtom(tabORef, "tab:connection")) ?? null;
+    const connSubmenu: ContextMenuItem[] = [
+        {
+            label: "Clear Connection",
+            type: "checkbox",
+            checked: currentConn == null,
+            click: () =>
+                fireAndForget(() =>
+                    env.rpc.SetMetaCommand(TabRpcClient, { oref: tabORef, meta: { "tab:connection": null } })
+                ),
+        },
+        { type: "separator" },
+        ...connList.map((conn) => ({
+            label: conn,
+            type: "checkbox" as const,
+            checked: currentConn === conn,
+            click: () =>
+                fireAndForget(() =>
+                    env.rpc.SetMetaCommand(TabRpcClient, { oref: tabORef, meta: { "tab:connection": conn } })
+                ),
+        })),
+    ];
+    menu.push({ label: "Set Tab Connection", type: "submenu", submenu: connSubmenu }, { type: "separator" });
     const fullConfig = globalStore.get(env.atoms.fullConfigAtom);
     const bgPresets: string[] = [];
     for (const key in fullConfig?.presets ?? {}) {

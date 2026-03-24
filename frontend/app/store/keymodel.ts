@@ -372,6 +372,15 @@ function getDefaultNewBlockDef(): BlockDef {
             termBlockDef.meta.connection = blockData.meta.connection;
         }
     }
+    // Fallback: inherit connection from tab if not set by focused block
+    if (termBlockDef.meta.connection == null) {
+        const activeTabId = globalStore.get(atoms.staticTabId);
+        const tabAtom = WOS.getWaveObjectAtom<Tab>(WOS.makeORef("tab", activeTabId));
+        const tabData = globalStore.get(tabAtom);
+        if (tabData?.meta?.["tab:connection"] != null) {
+            termBlockDef.meta.connection = tabData.meta["tab:connection"];
+        }
+    }
     return termBlockDef;
 }
 

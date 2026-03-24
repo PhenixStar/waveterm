@@ -3,6 +3,7 @@
 
 import { getTabBadgeAtom } from "@/app/store/badge";
 import { refocusNode } from "@/app/store/global";
+import { RpcApi } from "@/app/store/wshclientapi";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import { WaveEnv, WaveEnvSubset, useWaveEnv } from "@/app/waveenv/waveenv";
 import { Button } from "@/element/button";
@@ -41,6 +42,7 @@ interface TabVProps {
     isNew: boolean;
     badges?: Badge[] | null;
     flagColor?: string | null;
+    connection?: string | null;
     onClick: () => void;
     onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null) => void;
     onDragStart: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -61,6 +63,7 @@ const TabV = forwardRef<HTMLDivElement, TabVProps>((props, ref) => {
         isNew,
         badges,
         flagColor,
+        connection,
         onClick,
         onClose,
         onDragStart,
@@ -204,6 +207,13 @@ const TabV = forwardRef<HTMLDivElement, TabVProps>((props, ref) => {
                     {displayName}
                 </div>
                 <TabBadges badges={badges} flagColor={flagColor} />
+                {connection && (
+                    <i
+                        className="fa fa-solid fa-server"
+                        title={`Connection: ${connection}`}
+                        style={{ fontSize: "10px", opacity: 0.6, marginLeft: "3px", marginRight: "2px" }}
+                    />
+                )}
                 <Button
                     className="ghost grey close"
                     onClick={onClose}
@@ -248,6 +258,7 @@ const TabInner = forwardRef<HTMLDivElement, TabProps>((props, ref) => {
             flagColor = null;
         }
     }
+    const connection = tabData?.meta?.["tab:connection"] ?? null;
 
     const loadedRef = useRef(false);
     const renameRef = useRef<(() => void) | null>(null);
@@ -266,8 +277,11 @@ const TabInner = forwardRef<HTMLDivElement, TabProps>((props, ref) => {
     const handleContextMenu = useCallback(
         (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
             e.preventDefault();
-            const menu = buildTabContextMenu(id, renameRef, onClose, env);
-            env.showContextMenu(menu, e);
+            const connListPromise = RpcApi.ConnListCommand(TabRpcClient, { timeout: 2000 }).catch(() => [] as string[]);
+            connListPromise.then((connList) => {
+                const menu = buildTabContextMenu(id, renameRef, onClose, env, connList);
+                env.showContextMenu(menu, e);
+            });
         },
         [id, onClose, env]
     );
@@ -292,6 +306,7 @@ const TabInner = forwardRef<HTMLDivElement, TabProps>((props, ref) => {
             isNew={isNew}
             badges={badges}
             flagColor={flagColor}
+            connection={connection}
             onClick={handleTabClick}
             onClose={onClose}
             onDragStart={onDragStart}

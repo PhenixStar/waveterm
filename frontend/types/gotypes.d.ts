@@ -1132,6 +1132,7 @@ declare global {
         "graph:metrics"?: string[];
         "sysinfo:type"?: string;
         "tab:flagcolor"?: string;
+        "tab:connection"?: string;
         "bg:*"?: boolean;
         bg?: string;
         "bg:opacity"?: number;

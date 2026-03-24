@@ -12,6 +12,9 @@
         "conn:wshpath": {
           "type": "string"
         },
+        "conn:moshenabled": {
+          "type": "boolean"
+        },
         "conn:shellpath": {
           "type": "string"
         },

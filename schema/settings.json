@@ -235,6 +235,9 @@
         "tab:confirmclose": {
           "type": "boolean"
         },
+        "tab:connection": {
+          "type": "string"
+        },
         "widget:*": {
           "type": "boolean"
         },
@@ -314,6 +317,9 @@
           "type": "boolean"
         },
         "conn:wshenabled": {
+          "type": "boolean"
+        },
+        "conn:moshenabled": {
           "type": "boolean"
         },
         "conn:localhostdisplayname": {

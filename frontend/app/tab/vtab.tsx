@@ -14,6 +14,7 @@ export interface VTabItem {
     badge?: Badge | null;
     badges?: Badge[] | null;
     flagColor?: string | null;
+    connection?: string | null;
 }
 
 interface VTabProps {
@@ -57,6 +58,7 @@ export function VTab({
     const editableTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const badges = tab.badges ?? (tab.badge ? [tab.badge] : null);
 
+    const connection = tab.connection ?? null;
     const rawFlagColor = tab.flagColor;
     let flagColor: string | null = null;
     if (rawFlagColor) {
@@ -200,6 +202,12 @@ export function VTab({
             >
                 {tab.name}
             </div>
+            {connection && (
+                <i
+                    className="fa fa-solid fa-server pointer-events-none mr-1 shrink-0 text-[10px] text-secondary/60"
+                    title={`Connection: ${connection}`}
+                />
+            )}
             {onClose && (
                 <button
                     type="button"

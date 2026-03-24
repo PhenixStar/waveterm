@@ -1,0 +1,25 @@
+.sysinfo-dials-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 180px;
+}
+
+.sysinfo-dial {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.sysinfo-dial-value {
+    font-size: 18px;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
+.sysinfo-dial-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--grey-text-color);
+}

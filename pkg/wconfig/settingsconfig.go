@@ -137,6 +137,7 @@ type SettingsType struct {
 
 	TabPreset       string `json:"tab:preset,omitempty"`
 	TabConfirmClose bool   `json:"tab:confirmclose,omitempty"`
+	TabConnection   string `json:"tab:connection,omitempty"`
 
 	WidgetClear    bool  `json:"widget:*,omitempty"`
 	WidgetShowHelp *bool `json:"widget:showhelp,omitempty"`

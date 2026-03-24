@@ -16,6 +16,7 @@ import { waveEventSubscribeSingle } from "@/app/store/wps";
 import { TabRpcClient } from "@/app/store/wshrpcutil";
 import type { BlockMetaKeyAtomFnType, WaveEnv, WaveEnvSubset } from "@/app/waveenv/waveenv";
 import { OverlayScrollbarsComponent, OverlayScrollbarsComponentRef } from "overlayscrollbars-react";
+import { SysinfoDials } from "./sysinfo-dial";
 
 export type SysinfoEnv = WaveEnvSubset<{
     rpc: {
@@ -94,6 +95,9 @@ const PlotTypes: object = {
     },
     "CPU + GPU": function (_dataItem: DataItem): Array<string> {
         return ["cpu", "gpu"];
+    },
+    Dials: function (_dataItem: DataItem): Array<string> {
+        return ["cpu", "mem:used", "gpu"];
     },
 };
 
@@ -575,8 +579,23 @@ const SysinfoViewInner = React.memo(({ model }: SysinfoViewProps) => {
     const plotData = jotai.useAtomValue(model.dataAtom);
     const yvals = jotai.useAtomValue(model.metrics);
     const plotMeta = jotai.useAtomValue(model.plotMetaAtom);
+    const plotType = jotai.useAtomValue(model.plotTypeSelectedAtom);
     const osRef = React.useRef<OverlayScrollbarsComponentRef>(null);
     const targetLen = jotai.useAtomValue(model.numPoints) + 1;
+
+    if (plotType === "Dials") {
+        const latestDataItem = plotData.length > 0 ? plotData[plotData.length - 1] : null;
+        return (
+            <OverlayScrollbarsComponent
+                ref={osRef}
+                className="flex flex-col flex-grow mb-0 overflow-y-auto"
+                options={{ scrollbars: { autoHide: "leave" } }}
+            >
+                <SysinfoDials dataItem={latestDataItem} plotMeta={plotMeta} />
+            </OverlayScrollbarsComponent>
+        );
+    }
+
     let title = false;
     let cols2 = false;
     if (yvals.length > 1) {

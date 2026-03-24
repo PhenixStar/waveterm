@@ -8,10 +8,13 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
+	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/shirou/gopsutil/v4/mem"
+	gopsnet "github.com/shirou/gopsutil/v4/net"
 	"github.com/wavetermdev/waveterm/pkg/wps"
 	"github.com/wavetermdev/waveterm/pkg/wshrpc"
 	"github.com/wavetermdev/waveterm/pkg/wshrpc/wshclient"
@@ -19,6 +22,17 @@ import (
 )
 
 const BYTES_PER_GB = 1073741824
+const BYTES_PER_MB = 1048576
+
+// delta state for disk I/O rates
+var (
+	diskMu        sync.Mutex
+	prevDiskRead  uint64
+	prevDiskWrite uint64
+	prevNetRx     uint64
+	prevNetTx     uint64
+	prevTs        time.Time
+)
 
 func getCpuData(values map[string]float64) {
 	percentArr, err := cpu.Percent(0, false)
@@ -46,6 +60,56 @@ func getMemData(values map[string]float64) {
 	values["mem:available"] = float64(memData.Available) / BYTES_PER_GB
 	values["mem:used"] = float64(memData.Used) / BYTES_PER_GB
 	values["mem:free"] = float64(memData.Free) / BYTES_PER_GB
+}
+
+func getDiskData(values map[string]float64) {
+	counters, err := disk.IOCounters()
+	if err == nil {
+		var totalRead, totalWrite uint64
+		for _, c := range counters {
+			totalRead += c.ReadBytes
+			totalWrite += c.WriteBytes
+		}
+		diskMu.Lock()
+		now := time.Now()
+		if !prevTs.IsZero() {
+			elapsed := now.Sub(prevTs).Seconds()
+			if elapsed > 0 {
+				values[wshrpc.TimeSeries_Disk+":read"] = float64(totalRead-prevDiskRead) / elapsed / BYTES_PER_MB
+				values[wshrpc.TimeSeries_Disk+":write"] = float64(totalWrite-prevDiskWrite) / elapsed / BYTES_PER_MB
+			}
+		}
+		prevDiskRead = totalRead
+		prevDiskWrite = totalWrite
+		diskMu.Unlock()
+	}
+	usage, err := disk.Usage("/")
+	if err == nil {
+		values[wshrpc.TimeSeries_Disk+":used"] = float64(usage.Used) / BYTES_PER_GB
+		values[wshrpc.TimeSeries_Disk+":total"] = float64(usage.Total) / BYTES_PER_GB
+	}
+}
+
+func getNetData(values map[string]float64) {
+	counters, err := gopsnet.IOCounters(false)
+	if err != nil || len(counters) == 0 {
+		return
+	}
+	agg := counters[0]
+	diskMu.Lock()
+	now := time.Now()
+	if !prevTs.IsZero() {
+		elapsed := now.Sub(prevTs).Seconds()
+		if elapsed > 0 {
+			values[wshrpc.TimeSeries_Net+":rx"] = float64(agg.BytesRecv-prevNetRx) / elapsed / BYTES_PER_MB
+			values[wshrpc.TimeSeries_Net+":tx"] = float64(agg.BytesSent-prevNetTx) / elapsed / BYTES_PER_MB
+		}
+	}
+	prevNetRx = agg.BytesRecv
+	prevNetTx = agg.BytesSent
+	diskMu.Unlock()
+	values[wshrpc.TimeSeries_Net+":rx:total"] = float64(agg.BytesRecv) / BYTES_PER_GB
+	values[wshrpc.TimeSeries_Net+":tx:total"] = float64(agg.BytesSent) / BYTES_PER_GB
 }
 
 func getGpuData(values map[string]float64) {
@@ -90,6 +154,11 @@ func generateSingleServerData(client *wshutil.WshRpc, connName string) {
 	getCpuData(values)
 	getMemData(values)
 	getGpuData(values)
+	getDiskData(values)
+	getNetData(values)
+	diskMu.Lock()
+	prevTs = now
+	diskMu.Unlock()
 	tsData := wshrpc.TimeSeriesData{Ts: now.UnixMilli(), Values: values}
 	event := wps.WaveEvent{
 		Event:   wps.Event_SysInfo,

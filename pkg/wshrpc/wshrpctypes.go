@@ -424,6 +424,8 @@ const (
 	TimeSeries_Cpu    = "cpu"
 	TimeSeries_Gpu    = "gpu"
 	TimeSeries_GpuMem = "gpu:mem"
+	TimeSeries_Disk   = "disk"
+	TimeSeries_Net    = "net"
 )
 
 type TimeSeriesData struct {

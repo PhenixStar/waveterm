@@ -96,6 +96,18 @@ const PlotTypes: object = {
     "CPU + GPU": function (_dataItem: DataItem): Array<string> {
         return ["cpu", "gpu"];
     },
+    Disk: function (_dataItem: DataItem): Array<string> {
+        return ["disk:read", "disk:write"];
+    },
+    Net: function (_dataItem: DataItem): Array<string> {
+        return ["net:rx", "net:tx"];
+    },
+    "Disk + Net": function (_dataItem: DataItem): Array<string> {
+        return ["disk:read", "disk:write", "net:rx", "net:tx"];
+    },
+    "All Metrics": function (_dataItem: DataItem): Array<string> {
+        return ["cpu", "mem:used", "gpu", "disk:read", "disk:write", "net:rx", "net:tx"];
+    },
     Dials: function (_dataItem: DataItem): Array<string> {
         return ["cpu", "mem:used", "gpu"];
     },
@@ -142,6 +154,37 @@ for (let i = 0; i < 8; i++) {
     DefaultPlotMeta[`gpu:mem:${i}:used`] = defaultGpuMemMeta(`GPU ${i} VRAM Used`, `gpu:mem:${i}:total`);
     DefaultPlotMeta[`gpu:mem:${i}:total`] = defaultGpuMemMeta(`GPU ${i} VRAM Total`, `gpu:mem:${i}:total`);
 }
+
+function defaultDiskMeta(name: string): TimeSeriesMeta {
+    return {
+        name: name,
+        label: "MB/s",
+        miny: 0,
+        maxy: null,
+        color: "var(--sysinfo-disk-color, #8b5cf6)",
+        decimalPlaces: 1,
+    };
+}
+
+function defaultNetMeta(name: string): TimeSeriesMeta {
+    return {
+        name: name,
+        label: "MB/s",
+        miny: 0,
+        maxy: null,
+        color: "var(--sysinfo-net-color, #f97316)",
+        decimalPlaces: 1,
+    };
+}
+
+DefaultPlotMeta["disk:read"] = defaultDiskMeta("Disk Read");
+DefaultPlotMeta["disk:write"] = { ...defaultDiskMeta("Disk Write"), color: "var(--sysinfo-disk-write-color, #a78bfa)" };
+DefaultPlotMeta["disk:used"] = { name: "Disk Used", label: "GB", miny: 0, maxy: "disk:total", color: "#8b5cf6", decimalPlaces: 1 };
+DefaultPlotMeta["disk:total"] = { name: "Disk Total", label: "GB", miny: 0, maxy: "disk:total", color: "#8b5cf6", decimalPlaces: 1 };
+DefaultPlotMeta["net:rx"] = defaultNetMeta("Net RX");
+DefaultPlotMeta["net:tx"] = { ...defaultNetMeta("Net TX"), color: "var(--sysinfo-net-tx-color, #fb923c)" };
+DefaultPlotMeta["net:rx:total"] = { name: "Total RX", label: "GB", miny: 0, maxy: null, color: "#f97316", decimalPlaces: 2 };
+DefaultPlotMeta["net:tx:total"] = { name: "Total TX", label: "GB", miny: 0, maxy: null, color: "#fb923c", decimalPlaces: 2 };
 
 function convertWaveEventToDataItem(event: Extract<WaveEvent, { event: "sysinfo" }>): DataItem {
     const eventData = event.data;

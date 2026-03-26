@@ -163,6 +163,22 @@ function AppSettingsUpdater() {
         } else {
             document.body.style.removeProperty("--main-bg-color");
         }
+        const cssVarMap: Record<string, string> = {
+            "window:accentcolor": "--accent-color",
+            "window:markdownfontfamily": "--markdown-font-family",
+            "window:markdownfontsize": "--markdown-font-size",
+            "window:sysinfocpucolor": "--sysinfo-cpu-color",
+            "window:sysinfomemcolor": "--sysinfo-mem-color",
+            "window:sysinfogpucolor": "--sysinfo-gpu-color",
+        };
+        for (const [settingsKey, cssVar] of Object.entries(cssVarMap)) {
+            const val = windowSettings?.[settingsKey];
+            if (val != null) {
+                document.body.style.setProperty(cssVar, String(val));
+            } else {
+                document.body.style.removeProperty(cssVar);
+            }
+        }
     }, [windowSettings]);
     return null;
 }

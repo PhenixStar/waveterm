@@ -162,6 +162,12 @@ type SettingsType struct {
 	WindowSaveLastWindow                bool     `json:"window:savelastwindow,omitempty"`
 	WindowDimensions                    string   `json:"window:dimensions,omitempty"`
 	WindowZoom                          *float64 `json:"window:zoom,omitempty"`
+	WindowAccentColor                   string   `json:"window:accentcolor,omitempty"`
+	WindowMarkdownFontFamily            string   `json:"window:markdownfontfamily,omitempty"`
+	WindowMarkdownFontSize              string   `json:"window:markdownfontsize,omitempty"`
+	WindowSysinfoCpuColor               string   `json:"window:sysinfocpucolor,omitempty"`
+	WindowSysinfoMemColor               string   `json:"window:sysinfomemcolor,omitempty"`
+	WindowSysinfoGpuColor               string   `json:"window:sysinfogpucolor,omitempty"`
 
 	TelemetryClear   bool `json:"telemetry:*,omitempty"`
 	TelemetryEnabled bool `json:"telemetry:enabled,omitempty"`

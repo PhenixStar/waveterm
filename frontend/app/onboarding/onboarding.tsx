@@ -97,7 +97,7 @@ const InitPage = ({
                         <div>
                             <a
                                 target="_blank"
-                                href="https://github.com/wavetermdev/waveterm?ref=install"
+                                href="https://github.com/PhenixStar/Terminlogy?ref=install"
                                 rel="noopener"
                                 className="text-accent"
                                 onClick={handleStarClick}
@@ -112,12 +112,12 @@ const InitPage = ({
                                 for individual users. Please show your support by giving us a star on{" "}
                                 <a
                                     target="_blank"
-                                    href="https://github.com/wavetermdev/waveterm?ref=install"
+                                    href="https://github.com/PhenixStar/Terminlogy?ref=install"
                                     rel="noopener"
                                     className="text-accent"
                                     onClick={handleStarClick}
                                 >
-                                    Github&nbsp;(wavetermdev/waveterm)
+                                    Github&nbsp;(PhenixStar/Terminlogy)
                                 </a>
                             </div>
                         </div>
@@ -208,7 +208,7 @@ const NoTelemetryStarPage = ({ isCompact }: { isCompact: boolean }) => {
             oref: WOS.makeORef("client", clientId),
             meta: { "onboarding:githubstar": true },
         });
-        window.open("https://github.com/wavetermdev/waveterm?ref=not", "_blank");
+        window.open("https://github.com/PhenixStar/Terminlogy?ref=not", "_blank");
         setPageName("features");
     };
 

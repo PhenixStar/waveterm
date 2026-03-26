@@ -241,6 +241,9 @@
         "tab:connection": {
           "type": "string"
         },
+        "tab:background": {
+          "type": "string"
+        },
         "widget:*": {
           "type": "boolean"
         },

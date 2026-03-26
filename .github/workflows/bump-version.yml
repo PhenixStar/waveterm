@@ -1,8 +1,9 @@
+# REBRAND: updated for Terminolgy
 # Workflow to manage bumping the package version and pushing it to the target branch with a new tag.
 # This workflow uses a GitHub App to bypass branch protection and uses the GitHub API directly to ensure commits and tags are signed.
 # For more information, see this doc: https://github.com/Nautilus-Cyberneering/pygithub/blob/main/docs/how_to_sign_automatic_commits_in_github_actions.md
 
-name: Bump Version
+name: Terminolgy Bump Version
 run-name: "branch: ${{ github.ref_name }}; semver-bump: ${{ inputs.bump }}; prerelease: ${{ inputs.is-prerelease }}"
 on:
     workflow_dispatch:
@@ -59,14 +60,14 @@ jobs:
 
             - name: "Bump Version: ${{ inputs.bump }}"
               id: bump-version
-              run: echo "WAVETERM_VERSION=$( task version -- ${{ inputs.bump }} ${{inputs.is-prerelease}} )" >> "$GITHUB_OUTPUT"
+              run: echo "TERMINOLGY_VERSION=$( task version -- ${{ inputs.bump }} ${{inputs.is-prerelease}} )" >> "$GITHUB_OUTPUT"
               shell: bash
 
-            - name: "Push version bump: ${{ steps.bump-version.outputs.WAVETERM_VERSION }}"
+            - name: "Push version bump: ${{ steps.bump-version.outputs.TERMINOLGY_VERSION }}"
               if: github.ref_protected
               run: |
                   # Create a new commit for the package version bump in package.json
-                  export VERSION=${{ steps.bump-version.outputs.WAVETERM_VERSION }}
+                  export VERSION=${{ steps.bump-version.outputs.TERMINOLGY_VERSION }}
                   export MESSAGE="chore: bump package version to $VERSION"
                   export FILE=package.json
                   export BRANCH=${{github.ref_name}}

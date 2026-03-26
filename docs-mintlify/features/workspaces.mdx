@@ -1,0 +1,24 @@
+---
+title: "Workspaces"
+description: "Organize multiple projects with isolated workspaces."
+icon: "briefcase"
+---
+
+{/* TODO: migrate from docs/docs/workspaces.mdx */}
+
+Workspaces let you group related tabs and settings under a single project context.
+
+## Creating a Workspace
+
+Access workspaces from the workspace selector in the top-left of the Terminolgy window.
+
+## Workspace Scoped Variables
+
+Use `tsh setvar` with workspace scope to keep variables isolated to a project:
+
+```bash
+tsh setvar -b workspace DEPLOY_ENV=staging
+tsh getvar -b workspace DEPLOY_ENV
+```
+
+{/* TODO: migrate full workspace reference from docs/docs/workspaces.mdx */}

@@ -1,6 +1,7 @@
+# REBRAND: updated for Terminolgy
 # Workflow to copy artifacts from the staging bucket to the release bucket when a new GitHub Release is published.
 
-name: Publish Release
+name: Terminolgy Publish Release
 run-name: Publish ${{ github.ref_name }}
 on:
     release:

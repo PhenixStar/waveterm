@@ -1,0 +1,140 @@
+---
+title: "Getting Started"
+description: "Install Terminolgy and get up and running in minutes."
+---
+
+Terminolgy is a modern terminal that includes graphical capabilities like web browsing, file previews, and AI assistance alongside traditional terminal features.
+
+## Installation
+
+<Tabs>
+  <Tab title="macOS">
+    **Platform requirements**
+    - Supported architectures: Apple Silicon, x64
+    - Supported OS version: macOS 11 Big Sur or later
+
+    **Homebrew**
+    ```bash
+    brew install --cask terminolgy
+    ```
+
+    You can also download installers directly from the [Downloads page](https://terminolgy.io/download).
+  </Tab>
+  <Tab title="Windows">
+    **Platform requirements**
+    - Supported architectures: x64
+    - Supported OS version: Windows 10 1809 or later, Windows 11
+
+    <Note>
+      ARM64 is planned but currently blocked by upstream dependencies.
+    </Note>
+
+    **Windows Package Manager**
+    ```powershell
+    winget install Terminolgy.Terminolgy
+    ```
+
+    **Chocolatey**
+    ```powershell
+    choco install terminolgy
+    ```
+
+    You can also download installers directly from the [Downloads page](https://terminolgy.io/download).
+  </Tab>
+  <Tab title="Linux">
+    **Platform requirements**
+    - Supported architectures: x64, ARM64
+    - Supported OS version: must have glibc-2.28 or later (Debian >=10, RHEL >=8, Ubuntu >=20.04, etc.)
+
+    **Snap**
+    ```bash
+    sudo snap install --classic terminolgy
+    ```
+
+    Other options: [AUR package](https://aur.archlinux.org/packages/terminolgy) (community maintained), [Nix package](https://search.nixos.org/packages) (community maintained)
+  </Tab>
+</Tabs>
+
+## Core Concepts
+
+### Tabs and Blocks
+
+- **Tabs**: Like browser tabs, these help organize your work. Create new tabs with `Cmd+T`.
+- **Blocks**: The building blocks of Terminolgy. Each block can be a terminal, web browser, file preview, or other widget.
+- **Layout**: Blocks can be dragged, dropped, and resized to create your ideal layout.
+
+### Key Features
+
+<AccordionGroup>
+  <Accordion title="Terminal Features">
+    - Works with common shells (bash, zsh, fish)
+    - Supports standard terminal features (readline, control sequences, etc.)
+    - Includes the `tsh` command for interacting with GUI features
+    - GPU accelerated on most platforms
+  </Accordion>
+  <Accordion title="Graphical Widgets">
+    - Preview files (images, video, markdown, code with syntax highlighting)
+    - Browse web pages
+    - Ask questions and get AI help directly from the terminal
+    - Basic system monitoring graphs
+  </Accordion>
+  <Accordion title="Remote Connections">
+    - Easy SSH connections via the connection button
+    - WSL integration on Windows
+    - Consistent experience across local and remote sessions
+  </Accordion>
+</AccordionGroup>
+
+## Quick Start Guide
+
+**1. Open Your First Tab**
+
+New Terminolgy tabs start with a single terminal block. Create additional blocks with `Cmd+N`.
+
+**2. Try Some Basic Commands**
+
+```bash
+# View a file or directory
+tsh view ~/Documents
+
+# Open a webpage
+tsh web open github.com
+
+# Get AI assistance
+tsh ai -m "how do I find large files in my current directory?" -s
+```
+
+**3. Customize Your Layout**
+
+- Drag block headers to rearrange them
+- Hover between blocks to resize them
+- Right-click tab headers for background options
+- Right-click block headers for block-specific options
+
+**4. Connect to Remote Machines**
+
+- Click the connection button in the toolbar
+- Enter `username@hostname` for SSH connections
+- Or select a WSL distribution on Windows
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Key Bindings" icon="keyboard" href="/configuration/settings">
+    Work more efficiently with keyboard shortcuts.
+  </Card>
+  <Card title="Tab Layouts" icon="grid-2" href="/features/blocks">
+    Organize your workspace with the layout system.
+  </Card>
+  <Card title="Custom Widgets" icon="puzzle-piece" href="/configuration/widgets">
+    Quick access to your most-used tools.
+  </Card>
+  <Card title="Terminolgy AI" icon="sparkles" href="/features/ai">
+    Configure your preferred AI models.
+  </Card>
+</CardGroup>
+
+## Getting Help
+
+- Join the [Discord community](https://discord.gg/XfvZ334gwU) for help and discussions
+- Report issues on [GitHub](https://github.com/PhenixStar/terminolgy/issues)

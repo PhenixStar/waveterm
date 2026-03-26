@@ -1,0 +1,44 @@
+---
+title: "Blocks and Layout"
+description: "Organize your workspace with Terminolgy's flexible block layout system."
+icon: "grid-2"
+---
+
+{/* TODO: migrate from docs/docs/layout.mdx and docs/docs/tabs.mdx */}
+
+Terminolgy's workspace is built around **blocks** — individual components that can be arranged freely within tabs.
+
+## Tabs
+
+Tabs work like browser tabs to organize your work. Each tab has its own independent layout of blocks.
+
+| Action | Shortcut |
+|--------|----------|
+| New tab | `Cmd+T` |
+| Close tab | `Cmd+Shift+W` |
+| Switch tabs | `Cmd+1-9` |
+
+## Blocks
+
+Each block can be a terminal, web browser, file preview, or other widget. Blocks within a tab form a flexible grid that you can reorganize at will.
+
+### Moving Blocks
+
+Drag a block's header to move it. Valid drop zones highlight in green:
+- Over half a block — insert beside it
+- Over an edge — insert at the screen edge
+- Over a full block — swap positions
+
+### Resizing Blocks
+
+Hover between two blocks to reveal a green dividing line. Drag it to resize.
+
+### Block Numbers
+
+Hold `Ctrl+Shift` to see block numbers overlaid on each block. Use these numbers with `tsh` to target specific blocks:
+
+```bash
+tsh getmeta -b 2 file
+```
+
+{/* TODO: migrate full layout reference from docs/docs/layout.mdx */}

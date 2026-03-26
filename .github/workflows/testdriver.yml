@@ -1,8 +1,9 @@
-name: TestDriver.ai Run
+# REBRAND: updated for Terminolgy
+name: Terminolgy TestDriver.ai Run
 
 on:
     workflow_run:
-        workflows: ["TestDriver.ai Build"]
+        workflows: ["Terminolgy TestDriver.ai Build"]
         types:
             - completed
 
@@ -60,7 +61,7 @@ jobs:
                       }
 
                       $downloadFolder = "./download"
-                      $artifactFileName = "waveterm.exe"
+                      $artifactFileName = "terminolgy.exe"
                       $artifactFilePath = "$downloadFolder/$artifactFileName"
 
                       Write-Host "Starting the artifact download process..."
@@ -131,7 +132,7 @@ jobs:
                       }
 
                       # Optional: If the app executable is different from the installer, find and launch it
-                      $wavePath = Join-Path $env:USERPROFILE "AppData\Local\Programs\waveterm\Wave.exe"
+                      $wavePath = Join-Path $env:USERPROFILE "AppData\Local\Programs\terminolgy\Terminolgy.exe"
 
                       Write-Host "Launching the application: $($wavePath)"
                       Start-Process -FilePath $wavePath

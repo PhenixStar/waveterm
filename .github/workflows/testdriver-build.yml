@@ -1,4 +1,5 @@
-name: TestDriver.ai Build
+# REBRAND: updated for Terminolgy
+name: Terminolgy TestDriver.ai Build
 
 on:
     push:
@@ -79,5 +80,5 @@ jobs:
               id: upload
               uses: actions/upload-artifact@v5
               with:
-                  name: windows-exe
+                  name: terminolgy-windows-exe
                   path: make/*.exe

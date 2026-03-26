@@ -1,0 +1,486 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base>
+  <div class="page">
+    <!-- Nav -->
+    <nav class="nav">
+      <div class="nav-inner">
+        <span class="logo">Terminolgy</span>
+        <div class="nav-links">
+          <a href="https://github.com/terminolgy/terminolgy" target="_blank" rel="noopener">GitHub</a>
+          <a href="/docs">Docs</a>
+          <a href="#download" class="btn btn-sm">Download</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="badge">v1.0 — Now Available</div>
+        <h1 class="hero-title">
+          The terminal that<br /><span class="gradient-text">thinks with you</span>
+        </h1>
+        <p class="hero-sub">
+          Terminolgy is a sleek, AI-powered terminal built for engineers who move fast.
+          GPU telemetry, intelligent error analysis, multi-machine dashboards — all in one pane.
+        </p>
+        <div class="hero-ctas" id="download">
+          <a href="#" class="btn btn-primary">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z"/>
+            </svg>
+            Download for macOS
+          </a>
+          <a href="#" class="btn btn-secondary">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M0 13.772l6.545 1.9V8.941H0zM0 8.26h6.545V2.228L0 4.13zm7.265 7.526L16 18V8.94H7.265zm0-13.786v5.26H16V0z"/>
+            </svg>
+            Download for Windows
+          </a>
+          <a href="#" class="btn btn-ghost">Linux packages</a>
+        </div>
+        <p class="hero-note">Free and open source. Works on macOS, Windows, Linux.</p>
+      </div>
+
+      <!-- Terminal demo placeholder -->
+      <div class="demo-wrap">
+        <div class="demo-chrome">
+          <div class="chrome-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <span class="chrome-title">terminolgy — bash</span>
+        </div>
+        <div class="demo-body">
+          <div class="term-line"><span class="prompt">~</span> <span class="cmd">gpu status</span></div>
+          <div class="term-output gpu-output">
+            <div class="gpu-bar">
+              <span class="gpu-label">GPU 0 — NVIDIA A100</span>
+              <span class="gpu-util" style="color: #10b981">82% util</span>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width: 82%; background: #10b981"></div></div>
+            <div class="gpu-mem">VRAM 54.2 / 80 GB &nbsp;|&nbsp; Temp 71°C &nbsp;|&nbsp; Power 312W</div>
+          </div>
+          <div class="term-line mt"><span class="prompt">~</span> <span class="cmd">ai analyze --last-error</span></div>
+          <div class="term-output ai-output">
+            <span class="ai-tag">AI</span>
+            <span class="ai-text">CUDA OOM on layer 34. Reduce batch size or enable gradient checkpointing.</span>
+          </div>
+          <div class="term-line mt"><span class="prompt">~</span> <span class="cursor">_</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+      <div class="section-inner">
+        <h2 class="section-title">Everything your workflow needs</h2>
+        <p class="section-sub">Six purpose-built panels. One terminal.</p>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #10b981">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+              </svg>
+            </div>
+            <h3>GPU Sysinfo</h3>
+            <p>Real-time VRAM, utilisation, temperature, and power draw across all GPUs in the node.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #8b5cf6">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+              </svg>
+            </div>
+            <h3>AI Error Analysis</h3>
+            <p>Paste or pipe any error and get a concise root-cause summary with actionable fixes — powered by local or cloud LLMs.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #06b6d4">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M4 6h16M4 12h10M4 18h7"/>
+              </svg>
+            </div>
+            <h3>Command Palette</h3>
+            <p>Fuzzy-search every command, bookmark, and session from a single keystroke. No more hunting through history.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #f59e0b">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+            </div>
+            <h3>Multi-Machine Dashboard</h3>
+            <p>Tile SSH sessions and remote metrics side-by-side. Switch context without losing any pane.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #06b6d4">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+            </div>
+            <h3>Docker Panel</h3>
+            <p>List, exec, log-tail, and restart containers inline. No separate Docker Desktop needed.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon" style="color: #10b981">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/>
+                <circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/>
+                <path d="M6 6h4M14 6h4M6 18h4M14 18h4M12 9v3M12 12l-6 4M12 12l6 4"/>
+              </svg>
+            </div>
+            <h3>Network Topology</h3>
+            <p>Live graph of your LAN — devices, latency, and link states visualised without any agent install.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Platform support -->
+    <section class="platforms">
+      <div class="section-inner">
+        <h2 class="section-title">Runs everywhere</h2>
+        <div class="platform-row">
+          <div class="platform-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14.5v-9l7 4.5-7 4.5z"/>
+            </svg>
+            macOS 13+
+          </div>
+          <div class="platform-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 5h18v14H3V5zm2 2v10h14V7H5zm2 2h4v2H7V9zm6 0h4v2h-4V9zm-6 4h4v2H7v-2zm6 0h4v2h-4v-2z"/>
+            </svg>
+            Windows 10+
+          </div>
+          <div class="platform-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14.93V15h-2v1.93A8.001 8.001 0 0 1 4.07 9H6v-2H4.07A8.001 8.001 0 0 1 11 3.07V5h2V3.07A8.001 8.001 0 0 1 19.93 7H18v2h1.93A8.001 8.001 0 0 1 13 16.93z"/>
+            </svg>
+            Linux (deb, rpm, AppImage, Snap)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <span class="footer-logo">Terminolgy</span>
+        <div class="footer-links">
+          <a href="https://github.com/terminolgy/terminolgy" target="_blank" rel="noopener">GitHub</a>
+          <a href="/docs">Docs</a>
+          <a href="#download">Download</a>
+          <a href="https://github.com/terminolgy/terminolgy/releases" target="_blank" rel="noopener">Releases</a>
+        </div>
+        <p class="footer-copy">MIT License &copy; 2025 Terminolgy contributors</p>
+      </div>
+    </footer>
+  </div>
+</Base>
+
+<style>
+  /* ---- Reset / Base ---- */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :global(html) {
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+
+  :global(body) {
+    background: #0a0a12;
+    color: #e2e8f0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* ---- Custom properties ---- */
+  .page {
+    --cyan: #06b6d4;
+    --purple: #8b5cf6;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --surface: #0f0f1a;
+    --surface-2: #161625;
+    --border: rgba(255,255,255,0.08);
+    --text-muted: #94a3b8;
+  }
+
+  /* ---- Nav ---- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10, 10, 18, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+  .nav-links a { color: var(--text-muted); transition: color 0.15s; }
+  .nav-links a:hover { color: #fff; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    color: #fff;
+  }
+  .btn-secondary {
+    background: var(--surface-2);
+    color: #fff;
+    border: 1px solid var(--border);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  /* ---- Hero ---- */
+  .hero {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 5rem 1.5rem 4rem;
+    display: grid;
+    gap: 3rem;
+  }
+  @media (min-width: 900px) {
+    .hero { grid-template-columns: 1fr 1fr; align-items: start; }
+  }
+  .hero-inner { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid rgba(6, 182, 212, 0.4);
+    color: var(--cyan);
+    background: rgba(6, 182, 212, 0.08);
+    width: fit-content;
+  }
+
+  .hero-title {
+    font-size: clamp(2.4rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .gradient-text {
+    background: linear-gradient(90deg, var(--cyan) 0%, var(--purple) 60%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 480px;
+    line-height: 1.75;
+  }
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .hero-note {
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  /* ---- Terminal demo ---- */
+  .demo-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .demo-chrome {
+    background: #1e1e2e;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .chrome-dots { display: flex; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .chrome-title { font-size: 0.78rem; color: #64748b; margin-left: auto; }
+
+  .demo-body {
+    padding: 1.25rem 1.5rem;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+  .term-line { display: flex; gap: 0.5rem; align-items: center; }
+  .term-line.mt { margin-top: 1rem; }
+  .prompt { color: var(--cyan); font-weight: 700; }
+  .cmd { color: #e2e8f0; }
+  .cursor { color: var(--cyan); animation: blink 1.2s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .term-output { margin-top: 0.4rem; padding-left: 1rem; }
+
+  .gpu-bar { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.3rem; }
+  .gpu-label { color: var(--text-muted); }
+  .progress-track { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+  .progress-fill { height: 100%; border-radius: 2px; }
+  .gpu-mem { font-size: 0.75rem; color: #64748b; margin-top: 0.3rem; }
+
+  .ai-output { display: flex; gap: 0.5rem; align-items: flex-start; }
+  .ai-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(139, 92, 246, 0.25);
+    color: var(--purple);
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .ai-text { color: #cbd5e1; font-size: 0.8rem; }
+
+  /* ---- Features ---- */
+  .features { padding: 5rem 1.5rem; }
+  .section-inner { max-width: 1120px; margin: 0 auto; }
+  .section-title {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+  .section-sub {
+    text-align: center;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+    margin-top: 3rem;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .feature-card:hover {
+    border-color: rgba(255,255,255,0.16);
+    transform: translateY(-2px);
+  }
+  .feature-icon { margin-bottom: 1rem; }
+  .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .feature-card p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.65; }
+
+  /* ---- Platforms ---- */
+  .platforms {
+    padding: 3rem 1.5rem 5rem;
+    border-top: 1px solid var(--border);
+  }
+  .platform-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  .platform-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .platform-badge svg { opacity: 0.6; }
+
+  /* ---- Footer ---- */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+  }
+  .footer-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem;
+    justify-content: space-between;
+  }
+  .footer-logo {
+    font-weight: 700;
+    font-size: 0.95rem;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .footer-links {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.85rem;
+  }
+  .footer-links a { color: var(--text-muted); transition: color 0.15s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { font-size: 0.8rem; color: #475569; }
+</style>

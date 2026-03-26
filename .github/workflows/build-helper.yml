@@ -1,8 +1,9 @@
+# REBRAND: updated for Terminolgy
 # Build Helper workflow - Builds, signs, and packages binaries for each supported platform, then uploads to a staging bucket in S3 for wider distribution.
 # For more information on the macOS signing and notarization, see https://www.electron.build/code-signing and https://www.electron.build/configuration/mac
 # For more information on the Windows Code Signing, see https://docs.digicert.com/en/digicert-keylocker/ci-cd-integrations/plugins/github-custom-action-for-keypair-signing.html and https://docs.digicert.com/en/digicert-keylocker/signing-tools/sign-authenticode-with-electron-builder-using-ksp-integration.html
 
-name: Build Helper
+name: Terminolgy Build Helper
 run-name: Build ${{ github.ref_name }}${{ github.event_name == 'workflow_dispatch' && ' - Manual' || '' }}
 on:
     push:
@@ -16,7 +17,7 @@ env:
 jobs:
     build-app:
         outputs:
-            version: ${{ steps.set-version.outputs.WAVETERM_VERSION }}
+            version: ${{ steps.set-version.outputs.TERMINOLGY_VERSION }}
         strategy:
             matrix:
                 include:
@@ -92,7 +93,7 @@ jobs:
 
             - name: "Set Version"
               id: set-version
-              run: echo "WAVETERM_VERSION=$(task version)" >> "$GITHUB_OUTPUT"
+              run: echo "TERMINOLGY_VERSION=$(task version)" >> "$GITHUB_OUTPUT"
               shell: bash
 
             # Windows Code Signing Setup
@@ -193,7 +194,7 @@ jobs:
               uses: softprops/action-gh-release@v2
               with:
                   prerelease: ${{ contains(github.ref_name, '-beta') }}
-                  name: Wave Terminal ${{ github.ref_name }} Release
+                  name: Terminolgy ${{ github.ref_name }} Release
                   generate_release_notes: true
                   draft: true
                   files: |

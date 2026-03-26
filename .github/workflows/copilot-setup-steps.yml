@@ -1,4 +1,5 @@
-name: Copilot Setup Steps
+# REBRAND: updated for Terminolgy
+name: Terminolgy Copilot Setup Steps
 
 on:
     workflow_dispatch:

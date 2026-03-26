@@ -1,0 +1,109 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Terminolgy",
+  "logo": {
+    "dark": "/images/logo-dark.svg",
+    "light": "/images/logo-light.svg",
+    "href": "https://terminolgy.io"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#06b6d4",
+    "light": "#22d3ee",
+    "dark": "#0891b2",
+    "anchors": {
+      "from": "#06b6d4",
+      "to": "#8b5cf6"
+    }
+  },
+  "fonts": {
+    "headings": "Inter",
+    "body": "Inter",
+    "code": "Fira Code"
+  },
+  "navbar": {
+    "links": [
+      { "name": "GitHub", "url": "https://github.com/PhenixStar/terminolgy" }
+    ],
+    "primary": {
+      "type": "button",
+      "name": "Download",
+      "url": "https://github.com/PhenixStar/terminolgy/releases/latest"
+    }
+  },
+  "tabs": [
+    { "name": "Documentation", "url": "/" },
+    { "name": "TSH Reference", "url": "/tsh" }
+  ],
+  "anchors": [
+    {
+      "name": "Discord",
+      "icon": "discord",
+      "url": "https://discord.gg/XfvZ334gwU"
+    },
+    {
+      "name": "GitHub",
+      "icon": "github",
+      "url": "https://github.com/PhenixStar/terminolgy"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": ["introduction", "quickstart"]
+    },
+    {
+      "group": "Configuration",
+      "pages": [
+        "configuration/settings",
+        "configuration/widgets",
+        "configuration/connections",
+        "configuration/themes",
+        "configuration/presets"
+      ]
+    },
+    {
+      "group": "Features",
+      "pages": [
+        "features/ai",
+        "features/blocks",
+        "features/sysinfo",
+        "features/web-view",
+        "features/workspaces",
+        "features/command-palette"
+      ]
+    },
+    {
+      "group": "TSH Shell Helper",
+      "tab": "TSH Reference",
+      "pages": [
+        "tsh/overview",
+        "tsh/commands",
+        "tsh/remote-browse"
+      ]
+    },
+    {
+      "group": "Development",
+      "pages": [
+        "development/building",
+        "development/contributing",
+        "development/architecture"
+      ]
+    }
+  ],
+  "footer": {
+    "socials": {
+      "github": "https://github.com/PhenixStar/terminolgy",
+      "discord": "https://discord.gg/XfvZ334gwU"
+    }
+  },
+  "seo": {
+    "metatags": [
+      {
+        "name": "keywords",
+        "content": "terminal, developer, development, command, line, terminolgy, linux, macos, windows, connection, ssh, cli, documentation, docs, ai, graphical, widgets, remote, open-source"
+      }
+    ]
+  }
+}

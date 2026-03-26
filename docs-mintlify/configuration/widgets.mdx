@@ -1,0 +1,94 @@
+---
+title: "Widgets"
+description: "Every component in Terminolgy lives in its own widget — learn how to add, manage, and use them."
+icon: "rocket"
+---
+
+Every individual component is contained in its own widget. These can be added, removed, moved, and resized. Each widget has its own header which can be right-clicked to reveal more operations.
+
+## Managing Widgets
+
+### How to Add a Widget
+
+Adding a widget is done using the widget bar on the right-hand side of the window. This adds a widget of the selected type to the current tab.
+
+### How to Close a Widget
+
+Widgets can be closed by clicking the **X** button on the right side of the header. Alternatively, the currently focused widget can be closed by pressing `Cmd+W`.
+
+### How to Navigate Widgets
+
+At most, one widget can be focused at a time. A focused widget is always outlined with a distinct border. Click any widget to focus it. You can also change focus using `Ctrl+Shift+Arrow Keys` to navigate relative to the currently selected widget.
+
+### How to Magnify Widgets
+
+Magnifying a widget pops it out in front of everything else. Use the header icon or press `Cmd+M`.
+
+### How to Reorganize Widgets
+
+Drag and drop widget headers to move them to different locations. When dragging, you will see a preview of the widget. When over a valid drop point, the target area turns green:
+
+- **Green covering half of two widgets**: places the widget between the two
+- **Green covering half of one widget at the screen edge**: places the widget between that widget and the edge
+- **Green covering one widget entirely**: the two widgets swap locations
+
+### How to Resize Widgets
+
+Hover between two widgets to reveal a green dividing line and resize cursor. Drag this line to resize adjacent widgets.
+
+## Types of Widgets
+
+### Term
+
+The standard terminal. Enhanced with `tsh` command plugins — see [TSH Overview](/tsh/overview) for details.
+
+### Preview
+
+The generic widget for viewing files. Opens different views based on file type. Use `tsh view [path]` from any terminal to open a preview widget:
+
+```bash
+tsh view .
+tsh view ~/myimage.jpg
+tsh view README.md
+```
+
+<AccordionGroup>
+  <Accordion title="Directory View">
+    When viewing a directory, Preview shows a file viewer similar to macOS Finder or Windows File Explorer, optimized for development (shows `ls -alh` output style).
+
+    **Key actions:**
+    - **Open a file**: Double-click a row, or use arrow keys to select and press Enter
+    - **Copy a file**: Drag between two open directory widgets (works across connections)
+    - **Parent directory**: Open `..` or press `Cmd+ArrowUp`
+    - **Back/Forward**: `Cmd+ArrowLeft` / `Cmd+ArrowRight`
+    - **Filter files**: Start typing to filter by filename; press Escape to clear
+    - **Sort**: Click a column header; click again to reverse order
+    - **Toggle hidden files**: Click the eye icon in the widget header
+    - **Refresh**: Click the refresh button in the widget header
+    - **Common directories**: Click and hold the folder icon for Home, Desktop, Downloads, Root
+    - **Open Terminal here**: Right-click the header → "Open Terminal in New Widget"
+    - **Quick Look (macOS)**: Select a file and press Space
+  </Accordion>
+  <Accordion title="Markdown">
+    Opening a markdown file renders it as formatted HTML. Files cannot be edited in preview mode.
+  </Accordion>
+  <Accordion title="Images and Media">
+    Opening an image displays it. Opening a video opens a player.
+  </Accordion>
+</AccordionGroup>
+
+### Codeedit
+
+Opening most text files opens Codeedit — a Monaco-based editor. It is technically part of Preview but important enough to highlight separately.
+
+<Tip>
+  After opening Codeedit, magnify it with `Cmd+M` for a larger view. Then use the hotkeys below to switch to edit mode, make edits, save, and close with `Cmd+W` — all without the mouse.
+</Tip>
+
+| Action | Shortcut |
+|--------|----------|
+| Switch to edit mode | `Cmd+E` |
+| Save edit | `Cmd+S` |
+| Exit edit mode without saving | `Cmd+R` |
+| Close widget | `Cmd+W` |
+| Magnify widget | `Cmd+M` |

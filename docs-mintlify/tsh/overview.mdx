@@ -1,0 +1,191 @@
+---
+title: "TSH Overview"
+description: "The tsh command provides Terminolgy's core CLI, letting you control graphical widgets from the terminal."
+icon: "rectangle-terminal"
+---
+
+The `tsh` command provides Terminolgy's core command line interface, allowing users to interact with both terminal and graphical elements from the command line.
+
+See the [tsh commands reference](/tsh/commands) for a list of all commands and arguments.
+
+## Overview
+
+`tsh` enables seamless interaction between your terminal commands and Terminolgy's graphical blocks. It allows you to:
+
+- Control graphical widgets directly from the command line
+- Share data between terminal sessions and GUI components
+- Manage your workspace programmatically
+- Connect remote and local environments
+- Send CLI output and files directly to AI conversations
+- Run terminal commands in separate, isolated blocks
+
+## Key Concepts
+
+### Interacting with Blocks
+
+`tsh` provides direct interaction with Terminolgy's graphical blocks:
+
+```bash
+# Open a file in the editor
+tsh edit config.json
+
+# Get the current file path from a preview block
+tsh getmeta -b 2 file
+
+# Send output to an AI assistant (the "-" reads from stdin)
+ls -la | tsh ai - "what are the largest files here?"
+```
+
+### Persistent State
+
+`tsh` maintains state across terminal sessions through its variable system:
+
+```bash
+# Store a variable that persists across sessions
+tsh setvar API_KEY=abc123
+
+# Store globally or in a specific scope
+tsh setvar DEPLOY_ENV=prod
+tsh setvar -b workspace DEPLOY_ENV=staging
+
+# Use stored variables in commands
+curl -H "Authorization: $(tsh getvar API_KEY)" https://api.example.com
+```
+
+### Accessing Local Files from Remote
+
+When working on remote machines, access local files using the `tsh://local/~/` path prefix:
+
+```bash
+# Read a local file from a remote machine
+tsh file cat tsh://local/~/config/app.json
+
+# Run a local script on the remote machine
+bash <(tsh file cat tsh://local/~/scripts/deploy.sh)
+
+# Copy a local file to the remote machine
+tsh file cp tsh://local/~/data.csv ./remote-data.csv
+
+# Copy remote file back to local machine
+tsh file cp ./results.txt tsh://local/~/results.txt
+
+# Shorthand: /~/ instead of tsh://local/~/
+tsh file cat /~/config/app.json
+```
+
+### Block Management
+
+Every visual element in Terminolgy is a block (hold `Ctrl+Shift` to see block numbers):
+
+```bash
+# Create a new block showing a webpage
+tsh web open github.com
+
+# Do a web search in a new block
+tsh web open "terminolgy terminal"
+
+# Run a command in a new block and auto-close when done
+tsh run -x -- npm test
+
+# Get information about the current block
+tsh getmeta
+```
+
+## Common Workflows
+
+### Development Workflow
+
+```bash
+# Open directory or markdown files
+tsh view .
+tsh view README.md
+
+# Open in magnified mode
+tsh view -m README.md
+
+# Start development server in a new block
+tsh run -m -- npm run dev
+
+# Open documentation in a web block
+tsh web open http://localhost:3000
+```
+
+### Remote Development
+
+```bash
+# Connect to remote server
+tsh ssh -i ~/.ssh/mykey.pem dev@server
+
+# Edit remote files
+tsh edit /etc/nginx/nginx.conf
+
+# Monitor remote logs
+tsh run -- tail -f /var/log/app.log
+
+# Share variables between sessions
+tsh setvar -b tab SHARED_ENV=staging
+```
+
+### AI-Assisted Development
+
+The `tsh ai` command appends content to the Terminolgy AI sidebar. By default, files are attached without auto-submitting, so you can review and add more context before sending.
+
+```bash
+# Pipe output to AI sidebar
+git diff | tsh ai -
+
+# Attach files with a message
+tsh ai main.go utils.go -m "find bugs in these files"
+
+# Auto-submit with message
+tsh ai config.json -s -m "explain this config"
+
+# Start new chat with attached files
+tsh ai -n *.log -m "analyze these logs"
+
+# Attach multiple file types
+tsh ai screenshot.png report.pdf app.py -m "review these"
+
+# Debug with stdin and auto-submit
+dmesg | tsh ai -s - -m "help me understand these errors"
+```
+
+**Flags:**
+- `-` — Read from stdin instead of a file
+- `-m, --message` — Add message text along with files
+- `-s, --submit` — Auto-submit immediately
+- `-n, --new` — Clear chat and start fresh conversation
+
+**File Limits:**
+- Text files: 200 KB max
+- PDFs: 5 MB max
+- Images: 7 MB max
+- Maximum 15 files per command
+
+## Scripting with tsh
+
+`tsh` commands can be combined in scripts to automate common tasks:
+
+```bash
+#!/bin/bash
+# Setup development environment
+tsh run -- docker-compose up -d
+tsh web open localhost:8080
+tsh view ./src
+tsh run -- npm run test:watch
+
+# Get notified when long-running tasks complete
+npm run build && tsh notify "Build complete" || tsh notify "Build failed"
+```
+
+## Tips
+
+- Use block numbers (1-9) to target specific blocks within a tab (hold `Ctrl+Shift` to see numbers)
+- Get full block IDs by right-clicking a block's header and selecting "Copy Block Id" (useful for scripting)
+- Use scopes: `this`, `tab`, `workspace`, or `global` for different storage contexts
+- Use `tsh setvar/getvar` for configuration and secrets
+- Use `tsh run` to execute commands in new blocks
+
+## Getting Help
+
+Run `tsh` with no arguments for available commands, or use `tsh [command] -h` for detailed help on a specific command.

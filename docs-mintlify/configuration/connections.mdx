@@ -1,0 +1,39 @@
+---
+title: "Remote Connections"
+description: "SSH, WSL, and remote machine connections in Terminolgy."
+icon: "network-wired"
+---
+
+{/* TODO: migrate from docs/docs/connections.mdx */}
+
+Terminolgy makes it easy to connect to remote machines via SSH or WSL.
+
+## Connecting to a Remote Machine
+
+Click the connection button in the Terminolgy toolbar and enter `username@hostname` to open an SSH connection.
+
+```bash
+# Connect via tsh
+tsh ssh user@remote-host
+tsh ssh -i ~/.ssh/mykey.pem user@remote-host
+```
+
+## WSL (Windows)
+
+On Windows, Terminolgy integrates with WSL distributions. Click the connection button and select your WSL distribution from the list.
+
+## Accessing Local Files from Remote
+
+When connected to a remote machine, use `tsh://local/~/` to access your local filesystem:
+
+```bash
+# Read a local config file from the remote machine
+tsh file cat tsh://local/~/config/app.json
+
+# Shorthand
+tsh file cat /~/config/app.json
+```
+
+See [TSH Remote Browse](/tsh/remote-browse) for full details.
+
+{/* TODO: migrate full connections reference from docs/docs/connections.mdx */}

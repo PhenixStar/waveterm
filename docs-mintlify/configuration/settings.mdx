@@ -1,0 +1,36 @@
+---
+title: "Settings & Configuration"
+description: "Customize Terminolgy's appearance, behavior, and key bindings."
+icon: "paintbrush"
+---
+
+{/* TODO: migrate from docs/docs/config.mdx and docs/docs/keybindings.mdx */}
+
+Terminolgy uses a YAML-based configuration file located at `~/.config/terminolgy/settings.yaml`.
+
+## Opening the Config File
+
+```bash
+tsh edit ~/.config/terminolgy/settings.yaml
+```
+
+Or use the menu: **Terminolgy → Settings**.
+
+## Key Bindings
+
+Terminolgy supports customizable keyboard shortcuts. Common defaults:
+
+| Action | macOS | Windows/Linux |
+|--------|-------|---------------|
+| New tab | `Cmd+T` | `Ctrl+T` |
+| New block | `Cmd+N` | `Ctrl+N` |
+| Close block | `Cmd+W` | `Ctrl+W` |
+| Magnify block | `Cmd+M` | `Ctrl+M` |
+| Toggle AI panel | `Cmd+Shift+A` | `Ctrl+Shift+A` |
+| Navigate blocks | `Ctrl+Shift+Arrow` | `Ctrl+Shift+Arrow` |
+
+<Info>
+  See the source file `docs/docs/keybindings.mdx` for the full key bindings reference.
+</Info>
+
+{/* TODO: migrate full config reference from docs/docs/config.mdx */}

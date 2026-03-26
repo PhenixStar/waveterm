@@ -1,5 +1,6 @@
+# REBRAND: updated for Terminolgy
 ---
-name: Merge Gatekeeper
+name: Terminolgy Merge Gatekeeper
 
 on:
     pull_request_target:

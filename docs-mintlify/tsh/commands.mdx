@@ -1,0 +1,317 @@
+---
+title: "TSH Command Reference"
+description: "Complete reference for all tsh commands — the Terminolgy shell helper CLI."
+icon: "code"
+---
+
+The `tsh` command is always available from Terminolgy blocks. It bridges data between your CLI and the graphical widget layer.
+
+For a conceptual overview, see [TSH Overview](/tsh/overview).
+
+---
+
+## view
+
+Open a preview block with the contents of any file or directory:
+
+```bash
+tsh view [path]
+tsh view -m [path]    # opens in magnified block
+```
+
+Easily preview images, markdown files, and directories. For code/text files this opens a Codeedit block for quick editing.
+
+---
+
+## edit
+
+Open a Codeedit block for the specified file:
+
+```bash
+tsh edit [path]
+tsh edit -m [path]    # opens in magnified block
+```
+
+Useful for quickly editing files on a local or remote machine. Returns immediately after opening the block. For `$EDITOR` integration, see [`tsh editor`](#editor).
+
+---
+
+## editor
+
+Open a Codeedit block and **block until the editor is closed**:
+
+```bash
+tsh editor [path]
+tsh editor -m [path]  # opens in magnified block
+```
+
+Useful for setting `$EDITOR` so CLI tools open files in Terminolgy's graphical editor:
+
+```bash
+export EDITOR="tsh editor"
+```
+
+The file must already exist. Use `-m` to open in magnified mode.
+
+---
+
+## getmeta
+
+View metadata of any block or tab:
+
+```bash
+# Get metadata for the current terminal block
+tsh getmeta
+
+# Get metadata for block number 2 (hold Ctrl+Shift to see block numbers)
+tsh getmeta -b 2
+
+# Get metadata for a specific block ID
+tsh getmeta -b [blockid]
+
+# Get metadata for the current tab
+tsh getmeta -b tab
+
+# Dump a single metadata key
+tsh getmeta [-b [blockid]] [key]
+
+# Dump keys with a prefix
+tsh getmeta -b tab "bg:*"
+
+# Include the 'clear' key with prefix
+tsh getmeta -b tab --clear-prefix "bg:*"
+```
+
+**Block ID formats:**
+- `this` — the current block (default)
+- `tab` — the current tab
+- `d6ff4966-231a-4074-b78a-20acc7226b41` — full UUID
+- `a67f55a3` — truncated to first 8 characters
+- `5` — block number (sequential, top-left to bottom-right; hold `Ctrl+Shift` to see overlay)
+
+---
+
+## setmeta
+
+Update metadata key-value pairs for blocks and tabs:
+
+```bash
+tsh setmeta -b [blockid] [key]=[value]
+tsh setmeta -b [blockid] file=~/myfile.txt
+tsh setmeta -b [blockid] url=https://terminolgy.io/
+
+# Set metadata from a JSON file
+tsh setmeta -b tab --json [jsonfile]
+
+# Set metadata from JSON on stdin
+tsh setmeta -b tab --json
+```
+
+When you update the metadata for a preview or web block, changes are reflected instantly.
+
+**Complex example** — copy background from one tab to the current tab:
+
+```bash
+tsh getmeta -b [other-tab-id] "bg:*" --clear-prefix | tsh setmeta -b tab --json -
+```
+
+---
+
+## ai
+
+Append content to the Terminolgy AI sidebar:
+
+```bash
+# Pipe output to AI sidebar
+git diff | tsh ai -
+docker logs mycontainer | tsh ai -
+
+# Attach files (review in UI before sending)
+tsh ai main.go utils.go
+tsh ai screenshot.png logs.txt
+
+# Attach files with message
+tsh ai app.py -m "find potential bugs"
+tsh ai *.log -m "analyze these error logs"
+
+# Auto-submit immediately
+tsh ai config.json -s -m "explain this configuration"
+tail -n 50 app.log | tsh ai -s - -m "what's causing these errors?"
+
+# Start a new chat
+tsh ai -n report.pdf data.csv -m "summarize these reports"
+
+# Mixed file types
+tsh ai architecture.png api-spec.pdf server.go -m "review the system design"
+```
+
+**Flags:**
+- `-m, --message <text>` — Add message text along with files
+- `-s, --submit` — Auto-submit immediately (default waits for user)
+- `-n, --new` — Clear current chat and start fresh conversation
+
+**File size limits:**
+- Text files: 200 KB max
+- PDF files: 5 MB max
+- Image files: 7 MB max
+- Maximum 15 files per command
+
+---
+
+## editconfig
+
+Open any Terminolgy config file:
+
+```bash
+tsh editconfig              # opens settings.json (default)
+tsh editconfig presets.json
+tsh editconfig widgets.json
+tsh editconfig presets/ai.json
+```
+
+---
+
+## setbg
+
+Set a background image or color for the current tab:
+
+```bash
+tsh setbg [--opacity value] [--tile|--center] [--size value] (image-path|"#color"|color-name)
+```
+
+```bash
+# Image backgrounds
+tsh setbg ~/pictures/background.jpg
+tsh setbg --opacity 0.3 ~/pictures/light-pattern.png
+tsh setbg --tile --opacity 0.2 ~/pictures/texture.png
+tsh setbg --center --size 200px ~/pictures/logo.png
+
+# Color backgrounds
+tsh setbg "#ff0000"     # hex (requires quotes)
+tsh setbg forestgreen   # CSS color name
+
+# Adjust opacity only
+tsh setbg --opacity 0.7
+
+# Remove background
+tsh setbg --clear
+
+# Preview without applying
+tsh setbg --print "#ff0000"
+```
+
+**Flags:**
+- `--opacity` — Background opacity (0.0–1.0, default 0.5)
+- `--tile` — Tile the image instead of cover
+- `--center` — Center the image without scaling
+- `--size` — Size for centered images (px, %, or auto)
+- `--clear` — Remove the background
+- `--print` — Show metadata without applying
+
+Supported image formats: JPEG, PNG, GIF, WebP, SVG.
+
+<Tip>
+  Use `--print` to preview the metadata for any background configuration without applying it. You can copy the JSON to use as a [Background Preset](/configuration/presets).
+</Tip>
+
+---
+
+## badge
+
+Set or clear a visual badge on a block or tab header:
+
+```bash
+tsh badge [icon]
+tsh badge --clear
+```
+
+Defaults to `circle-small` if no icon is provided. Icon names are [Font Awesome](https://fontawesome.com/icons) names without the `fa-` prefix.
+
+---
+
+## web
+
+Open or interact with web blocks:
+
+```bash
+tsh web open https://github.com
+tsh web open "terminolgy docs"    # web search
+tsh web open http://localhost:3000
+```
+
+---
+
+## run
+
+Execute a command in a new block:
+
+```bash
+tsh run -- npm run dev
+tsh run -m -- npm run dev     # open in magnified mode
+tsh run -x -- npm test        # auto-close block when done
+```
+
+---
+
+## ssh
+
+Connect to a remote machine in a new block:
+
+```bash
+tsh ssh user@remote-host
+tsh ssh -i ~/.ssh/mykey.pem user@remote-host
+```
+
+---
+
+## setvar / getvar
+
+Store and retrieve persistent variables:
+
+```bash
+# Set a variable (persists across sessions)
+tsh setvar API_KEY=abc123
+tsh setvar -b workspace DEPLOY_ENV=staging
+
+# Get a variable
+tsh getvar API_KEY
+tsh getvar -b workspace DEPLOY_ENV
+
+# Use in commands
+curl -H "Authorization: $(tsh getvar API_KEY)" https://api.example.com
+```
+
+**Scopes:** `this` (current block), `tab`, `workspace`, `global`
+
+---
+
+## file
+
+Interact with the Terminolgy file system (supports remote paths):
+
+```bash
+tsh file cat tsh://local/~/config/app.json   # Read local file from remote
+tsh file cp tsh://local/~/data.csv ./         # Copy local → remote
+tsh file cp ./results.txt tsh://local/~/      # Copy remote → local
+tsh file append tsh://local/~/app.log         # Append to local file
+tsh file cat /~/config/app.json               # Shorthand for tsh://local/~/
+```
+
+---
+
+## notify
+
+Send a desktop notification:
+
+```bash
+npm run build && tsh notify "Build complete" || tsh notify "Build failed"
+```
+
+---
+
+## Getting Help
+
+```bash
+tsh                      # list all commands
+tsh [command] -h         # help for a specific command
+```

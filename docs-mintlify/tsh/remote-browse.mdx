@@ -1,0 +1,44 @@
+---
+title: "Remote File Browse"
+description: "Access and navigate local files from remote SSH sessions using tsh."
+icon: "folder-open"
+---
+
+{/* TODO: migrate from docs/docs/ — remote file access content in wsh.mdx and wsh-reference.mdx */}
+
+When connected to a remote machine via SSH, `tsh` lets you access your local filesystem using the `tsh://local/~/` path prefix.
+
+## Path Syntax
+
+```bash
+tsh://local/~/path/to/file    # Full form
+/~/path/to/file               # Shorthand
+```
+
+## Common Operations
+
+```bash
+# Read a local config file from remote
+tsh file cat tsh://local/~/config/app.json
+tsh file cat /~/config/app.json
+
+# Run a local script on the remote machine
+bash <(tsh file cat tsh://local/~/scripts/deploy.sh)
+python <(tsh file cat tsh://local/~/scripts/deploy.py)
+
+# Append remote output to a local log
+echo "Remote machine log entry" | tsh file append tsh://local/~/app.log
+
+# Copy local → remote
+tsh file cp tsh://local/~/data.csv ./remote-data.csv
+
+# Copy remote → local
+tsh file cp ./results.txt tsh://local/~/results.txt
+```
+
+## Use Cases
+
+- **Config management**: Reference your local dotfiles and config from any remote server
+- **Script distribution**: Run scripts stored locally on remote machines without copying them
+- **Log aggregation**: Append remote logs to a local file for centralized analysis
+- **File transfer**: Bidirectional file copy without needing `scp` or `rsync`

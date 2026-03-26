@@ -1,0 +1,24 @@
+---
+title: "Architecture"
+description: "Overview of Terminolgy's technical architecture."
+icon: "sitemap"
+---
+
+{/* TODO: add architecture documentation */}
+
+Terminolgy is built with:
+
+- **Frontend**: React + TypeScript (Electron renderer)
+- **Backend**: Go (core terminal, block management, connections)
+- **IPC**: Custom block protocol over WebSocket
+- **Editor**: Monaco (VS Code's editor component)
+- **Renderer**: Chromium (via Electron) for web views and UI
+
+## Key Components
+
+- **Block system**: Every widget is a block with isolated state, addressable by ID or number
+- **tsh protocol**: Unix socket-based IPC between shell sessions and the GUI layer
+- **Connection manager**: SSH tunneling and WSL integration
+- **AI bridge**: Proxies AI requests through the Terminolgy Cloud service or directly to BYOK providers
+
+{/* TODO: expand with detailed architecture diagrams once source reviewed */}

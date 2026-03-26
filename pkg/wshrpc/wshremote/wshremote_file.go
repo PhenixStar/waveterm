@@ -157,7 +157,7 @@ func (impl *ServerImpl) RemoteFileCopyCommand(ctx context.Context, data wshrpc.C
 		return false, fmt.Errorf("file %q size %d exceeds transfer limit of %d bytes", data.SrcUri, srcFileInfo.Size, RemoteFileTransferSizeLimit)
 	}
 
-	destFilePath, err := prepareDestForCopy(destPathCleaned, filepath.Base(srcConn.Path), destHasSlash, opts.Overwrite)
+	destFilePath, err := prepareDestForCopy(destPathCleaned, fspath.Base(srcConn.Path), destHasSlash, opts.Overwrite)
 	if err != nil {
 		return false, err
 	}

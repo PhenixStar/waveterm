@@ -18,7 +18,7 @@ const (
 var waveSrvClient_Singleton *wshutil.WshRpc
 var waveSrvClient_Once = &sync.Once{}
 
-// returns the wavesrv main rpc client singleton
+// returns the terminolgy-srv main rpc client singleton
 func GetMainRpcClient() *wshutil.WshRpc {
 	waveSrvClient_Once.Do(func() {
 		waveSrvClient_Singleton = wshutil.MakeWshRpc(wshrpc.RpcContext{}, &WshServerImpl, "main-client")

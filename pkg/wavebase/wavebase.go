@@ -50,12 +50,12 @@ const (
 
 const NeedJwtConst = "NEED-JWT"
 
-var ConfigHome_VarCache string          // caches WAVETERM_CONFIG_HOME
-var DataHome_VarCache string            // caches WAVETERM_DATA_HOME
-var AppPath_VarCache string             // caches WAVETERM_APP_PATH
-var AppResourcesPath_VarCache string    // caches WAVETERM_RESOURCES_PATH
-var AppElectronExecPath_VarCache string // caches WAVETERM_ELECTRONEXECPATH
-var Dev_VarCache string                 // caches WAVETERM_DEV
+var ConfigHome_VarCache string          // caches TERMINOLGY_CONFIG_HOME
+var DataHome_VarCache string            // caches TERMINOLGY_DATA_HOME
+var AppPath_VarCache string             // caches TERMINOLGY_APP_PATH
+var AppResourcesPath_VarCache string    // caches TERMINOLGY_RESOURCES_PATH
+var AppElectronExecPath_VarCache string // caches TERMINOLGY_ELECTRONEXECPATH
+var Dev_VarCache string                 // caches TERMINOLGY_DEV
 
 const WaveLockFile = "wave.lock"
 const DomainSocketBaseName = "wave.sock"
@@ -326,7 +326,7 @@ func determineLang() string {
 
 		return preferredLang
 	} else {
-		// this is specifically to get the wavesrv LANG so waveshell
+		// this is specifically to get the terminolgy-srv LANG
 		// on a remote uses the same LANG
 		return os.Getenv("LANG")
 	}

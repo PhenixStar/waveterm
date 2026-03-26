@@ -111,10 +111,6 @@ const BlockFrame_Default_Component = (props: BlockFrameProps) => {
     const magnifiedBlockBlur = jotai.useAtomValue(magnifiedBlockBlurAtom);
     const [magnifiedBlockOpacityAtom] = React.useState(() => waveEnv.getSettingsKeyAtom("window:magnifiedblockopacity"));
     const magnifiedBlockOpacity = jotai.useAtomValue(magnifiedBlockOpacityAtom);
-    const [compactHeadersAtom] = React.useState(() => waveEnv.getSettingsKeyAtom("block:compactheaders"));
-    const compactHeaders = jotai.useAtomValue(compactHeadersAtom) ?? false;
-    const framePinHeader = jotai.useAtomValue(waveEnv.getBlockMetaKeyAtom(nodeModel.blockId, "frame:pinheader"));
-    const frameActiveBorderColor = jotai.useAtomValue(waveEnv.getBlockMetaKeyAtom(nodeModel.blockId, "frame:activebordercolor"));
     const connBtnRef = React.useRef<HTMLDivElement>(null);
     const connName = jotai.useAtomValue(waveEnv.getBlockMetaKeyAtom(nodeModel.blockId, "connection"));
     const iconColor = jotai.useAtomValue(waveEnv.getBlockMetaKeyAtom(nodeModel.blockId, "icon:color"));
@@ -170,7 +166,6 @@ const BlockFrame_Default_Component = (props: BlockFrameProps) => {
                 "block-no-highlight": numBlocksInTab === 1 && !aiPanelVisible,
                 ephemeral: isEphemeral,
                 magnified: isMagnified,
-                "block-compact-header": compactHeaders && !isMagnified && !preview && !framePinHeader,
             })}
             data-blockid={nodeModel.blockId}
             onClick={blockModel?.onClick}
@@ -181,7 +176,6 @@ const BlockFrame_Default_Component = (props: BlockFrameProps) => {
                 {
                     "--magnified-block-opacity": magnifiedBlockOpacity,
                     "--magnified-block-blur": `${magnifiedBlockBlur}px`,
-                    ...(frameActiveBorderColor ? { "--compact-accent": frameActiveBorderColor } : {}),
                 } as React.CSSProperties
             }
             inert={preview || undefined}

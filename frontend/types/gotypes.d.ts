@@ -1085,7 +1085,6 @@ declare global {
         "frame:title"?: string;
         "frame:icon"?: string;
         "frame:text"?: string;
-        "frame:pinheader"?: boolean;
         "cmd:*"?: boolean;
         cmd?: string;
         "cmd:interactive"?: boolean;
@@ -1364,7 +1363,6 @@ declare global {
         "term:bellindicator"?: boolean;
         "term:osc52"?: string;
         "term:durable"?: boolean;
-        "term:aierroranalysis"?: boolean;
         "term:closeonlasttermclose"?: boolean;
         "editor:minimapenabled"?: boolean;
         "editor:stickyscrollenabled"?: boolean;
@@ -1411,8 +1409,6 @@ declare global {
         "window:zoom"?: number;
         "telemetry:*"?: boolean;
         "telemetry:enabled"?: boolean;
-        "block:*"?: boolean;
-        "block:compactheaders"?: boolean;
         "conn:*"?: boolean;
         "conn:askbeforewshinstall"?: boolean;
         "conn:wshenabled"?: boolean;

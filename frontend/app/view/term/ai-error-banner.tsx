@@ -38,10 +38,10 @@ function extractFirstCodeBlock(text: string): string | null {
 function getGlobalAiOpts(): WaveAIOptsType {
     const settings = globalStore.get(atoms.settingsAtom) ?? {};
     return {
-        model: settings["ai:model"] ?? null,
+        model: settings["ai:model"] ?? "",
         apitype: settings["ai:apitype"] ?? null,
         orgid: settings["ai:orgid"] ?? null,
-        apitoken: settings["ai:apitoken"] ?? null,
+        apitoken: settings["ai:apitoken"] ?? "",
         apiversion: settings["ai:apiversion"] ?? null,
         maxtokens: settings["ai:maxtokens"] ?? null,
         timeoutms: settings["ai:timeoutms"] ?? 60000,
@@ -50,26 +50,16 @@ function getGlobalAiOpts(): WaveAIOptsType {
     };
 }
 
-// Stable fallback atoms so hooks are never called conditionally
-const nullAtom = jotai.atom<null>(null);
-const nullStringAtom = jotai.atom<string | null>(null);
-
 export const AiErrorBanner = ({ blockId, model }: AiErrorBannerProps) => {
     const aiEnabledAtom = React.useMemo(() => getSettingsKeyAtom("term:aierroranalysis"), []);
     const aiEnabled = jotai.useAtomValue(aiEnabledAtom);
 
-    // cmd-mode: exit code via shellProcFullStatus
+    // cmd-mode: exit code via shellProcFullStatus (reactive atom on model)
     const shellProcFullStatus = jotai.useAtomValue(model.shellProcFullStatus);
 
-    // shell-integration: exit code via termWrap atoms (stable refs via useMemo)
-    const termWrap = model.termRef.current;
-    const siExitCodeAtom = termWrap?.lastCmdExitCodeAtom ?? nullAtom;
-    const siStatusAtom = termWrap?.shellIntegrationStatusAtom ?? nullAtom;
-    const lastCommandAtom = termWrap?.lastCommandAtom ?? nullStringAtom;
-
-    const siExitCode = jotai.useAtomValue(siExitCodeAtom as jotai.Atom<number | null>);
-    const siStatus = jotai.useAtomValue(siStatusAtom as jotai.Atom<string | null>);
-    const lastCommand = jotai.useAtomValue(lastCommandAtom);
+    // Fix CRITICAL 1: Do NOT read termRef.current at render time -- it is null on first render
+    // and ref mutations do not trigger re-renders, so atoms derived from it would be stuck on
+    // fallback null-atoms permanently. Read SI state via globalStore.get() in useMemo/callbacks.
     const aiFixRequested = jotai.useAtomValue(model.aiFixRequestedAtom);
 
     const [dismissed, setDismissed] = React.useState(false);
@@ -90,27 +80,38 @@ export const AiErrorBanner = ({ blockId, model }: AiErrorBannerProps) => {
             cmdCommand = blockMeta.cmd + (args?.length ? " " + args.join(" ") : "");
         }
 
-        // shell-integration: ready + non-zero exit from "D" handler
-        const siActive = siStatus === "ready" && siExitCode != null && siExitCode !== 0;
-        const siCmd = lastCommand;
+        // Fix CRITICAL 1+2: read SI atoms via globalStore (termRef.current may be null at render).
+        // Fix CRITICAL 2: do NOT require siStatus === "ready" -- the "D" OSC handler sets exit
+        // code while status stays "running-command", so the ready-check always suppressed banner.
+        const currentTermWrap = model.termRef.current;
+        const siExitCode = currentTermWrap
+            ? globalStore.get(currentTermWrap.lastCmdExitCodeAtom)
+            : null;
+        const lastCommand = currentTermWrap
+            ? globalStore.get(currentTermWrap.lastCommandAtom)
+            : null;
+        const siActive = siExitCode != null && siExitCode !== 0;
 
         if (siActive) {
-            return { exitCode: siExitCode, command: siCmd };
+            return { exitCode: siExitCode, command: lastCommand };
         }
         if (isCmdDone && cmdExitCode !== 0) {
             return { exitCode: cmdExitCode, command: cmdCommand };
         }
         return { exitCode: 0, command: null };
-    }, [shellProcFullStatus, siStatus, siExitCode, lastCommand]);
+    }, [shellProcFullStatus, model]);
 
-    // Dismiss when a new command starts
+    // Dismiss when a new SI command starts
     React.useEffect(() => {
+        const currentTermWrap = model.termRef.current;
+        if (!currentTermWrap) return;
+        const siStatus = globalStore.get(currentTermWrap.shellIntegrationStatusAtom);
         if (siStatus === "running-command") {
             setDismissed(true);
             setResponse({ text: "", isStreaming: false, error: null });
             cancelRef.current = true;
         }
-    }, [siStatus]);
+    }, [shellProcFullStatus, model]);
 
     // Dismiss when cmd-mode restarts (shellprocstatus transitions to "running")
     React.useEffect(() => {
@@ -130,14 +131,8 @@ export const AiErrorBanner = ({ blockId, model }: AiErrorBannerProps) => {
         }
     }, [exitCode, command]);
 
-    // Handle aiFixRequestedAtom toggle from Ctrl+Shift+F
-    React.useEffect(() => {
-        if (aiFixRequested && exitCode !== 0 && !response.isStreaming) {
-            globalStore.set(model.aiFixRequestedAtom, false);
-            fireAndForget(() => triggerAiFix());
-        }
-    }, [aiFixRequested]);
-
+    // Fix CRITICAL 3: triggerAiFix defined before the effect that uses it in deps.
+    // termRef.current is read inside the callback, not captured stale at render time.
     const triggerAiFix = React.useCallback(async () => {
         if (response.isStreaming) return;
         cancelRef.current = false;
@@ -148,7 +143,11 @@ export const AiErrorBanner = ({ blockId, model }: AiErrorBannerProps) => {
             let scrollbackContent = "";
             try {
                 const route = makeFeBlockRouteId(blockId);
-                const hasSI = globalStore.get(termWrap?.shellIntegrationStatusAtom ?? jotai.atom(null)) != null;
+                // Fix CRITICAL 3: read termRef.current inside callback
+                const currentTermWrap = model.termRef.current;
+                const hasSI =
+                    currentTermWrap != null &&
+                    globalStore.get(currentTermWrap.shellIntegrationStatusAtom) != null;
                 const scrollbackData = await RpcApi.TermGetScrollbackLinesCommand(
                     TabRpcClient,
                     { linestart: 0, lineend: 50, lastcommand: hasSI },
@@ -190,7 +189,16 @@ Briefly explain what went wrong and provide the corrected command or fix in a fe
         } catch (e) {
             setResponse({ text: "", isStreaming: false, error: (e as Error).message ?? "AI request failed" });
         }
-    }, [blockId, exitCode, command, response.isStreaming, termWrap]);
+    }, [blockId, exitCode, command, response.isStreaming, model]);
+
+    // Handle aiFixRequestedAtom toggle from Ctrl+Shift+F
+    // Fix HIGH 5: deps include exitCode, response.isStreaming, triggerAiFix
+    React.useEffect(() => {
+        if (aiFixRequested && exitCode !== 0 && !response.isStreaming) {
+            globalStore.set(model.aiFixRequestedAtom, false);
+            fireAndForget(() => triggerAiFix());
+        }
+    }, [aiFixRequested, exitCode, response.isStreaming, triggerAiFix]);
 
     // Skip render if disabled or no error or dismissed
     if (aiEnabled === false) return null;
@@ -226,7 +234,7 @@ Briefly explain what went wrong and provide the corrected command or fix in a fe
                     }}
                     title="Dismiss"
                 >
-                    ✕
+                    â
                 </button>
             </div>
             {hasResponse && (

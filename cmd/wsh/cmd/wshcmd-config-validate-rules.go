@@ -7,12 +7,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
 
 	"github.com/wavetermdev/waveterm/pkg/wconfig"
 )
+
+// expandTilde replaces a leading "~/" with the user's home directory.
+func expandTilde(path string) string {
+	if strings.HasPrefix(path, "~/") {
+		if home, err := os.UserHomeDir(); err == nil {
+			return filepath.Join(home, path[2:])
+		}
+	}
+	return path
+}
 
 // buildSettingsEnumMap extracts jsonschema enum tags from SettingsType at init-time.
 // Returns map[json-key] -> []allowed-values
@@ -286,7 +297,7 @@ func validateConnections(raw map[string]any) []Finding {
 			if paths, ok := ifRaw.([]any); ok {
 				for _, p := range paths {
 					if pathStr, ok := p.(string); ok {
-						if _, err := os.Stat(pathStr); os.IsNotExist(err) {
+						if _, err := os.Stat(expandTilde(pathStr)); os.IsNotExist(err) {
 							findings = append(findings, Finding{Severity: "WARN", File: "connections.json", Path: connName + ".ssh:identityfile", RuleID: "C04",
 								Message: fmt.Sprintf("identity file %q does not exist", pathStr)})
 						}
@@ -295,12 +306,12 @@ func validateConnections(raw map[string]any) []Finding {
 			}
 		}
 
-		// C05: conn:wshpath if set should exist
+		// C05: conn:wshpath if set must be an absolute path (path lives on the remote host)
 		if wshRaw, ok := connMap["conn:wshpath"]; ok && wshRaw != nil {
 			if wshPath, ok := wshRaw.(string); ok && wshPath != "" {
-				if _, err := os.Stat(wshPath); os.IsNotExist(err) {
+				if !strings.HasPrefix(wshPath, "/") {
 					findings = append(findings, Finding{Severity: "WARN", File: "connections.json", Path: connName + ".conn:wshpath", RuleID: "C05",
-						Message: fmt.Sprintf("wsh path %q does not exist", wshPath)})
+						Message: fmt.Sprintf("wsh path %q must be an absolute path (start with /)", wshPath)})
 				}
 			}
 		}

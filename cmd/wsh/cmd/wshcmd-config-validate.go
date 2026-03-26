@@ -29,7 +29,7 @@ type Finding struct {
 }
 
 var configValidateCmd = &cobra.Command{
-	Use:   "validate",
+	Use:   "config-validate",
 	Short: "Validate Wave Terminal configuration files",
 	Long:  "Validate settings.json, widgets.json, and connections.json for type errors, invalid enums, and bad ranges.",
 	RunE:  configValidateRun,
@@ -75,13 +75,13 @@ func configValidateRun(cmd *cobra.Command, args []string) error {
 		runFile("widgets.json", validateWidgets)
 		runFile("connections.json", validateConnections)
 	default:
-		return fmt.Errorf("unknown file %q — must be settings.json, widgets.json, or connections.json", configValidateFile)
+		return fmt.Errorf("unknown file %q - must be settings.json, widgets.json, or connections.json", configValidateFile)
 	}
 
 	if configValidateJsonFlag {
 		enc := json.NewEncoder(WrappedStdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(findings)
+		_ = enc.Encode(findings)
 	} else {
 		printFindings(findings)
 	}

@@ -10,8 +10,8 @@ vars:
         sh: node version.cjs
     RMRF: '{{if eq OS "windows"}}powershell -NoProfile -NonInteractive Remove-Item -Force -Recurse -ErrorAction SilentlyContinue{{else}}rm -rf{{end}}'
     DATE: '{{if eq OS "windows"}}powershell -NoProfile -NonInteractive Get-Date -UFormat{{else}}date{{end}}'
-    ARTIFACTS_BUCKET: waveterm-github-artifacts/staging-w2
-    RELEASES_BUCKET: dl.waveterm.dev/releases-w2
+    ARTIFACTS_BUCKET: # DISABLED: upstream S3 bucket
+    RELEASES_BUCKET: # DISABLED: upstream release bucket
     WINGET_PACKAGE: CommandLine.Wave
 
 tasks:
@@ -25,11 +25,11 @@ tasks:
             - build:backend
             - build:tsunamiscaffold
         env:
-            WAVETERM_ENVFILE: "{{.ROOT_DIR}}/.env"
-            WCLOUD_PING_ENDPOINT: "https://ping-dev.waveterm.dev/central"
-            WCLOUD_ENDPOINT: "https://api-dev.waveterm.dev/central"
-            WCLOUD_WS_ENDPOINT: "wss://wsapi-dev.waveterm.dev"
-            WAVETERM_NOCONFIRMQUIT: "1"
+            TERMINOLGY_ENVFILE: "{{.ROOT_DIR}}/.env"
+            WCLOUD_PING_ENDPOINT: ""
+            WCLOUD_ENDPOINT: ""
+            WCLOUD_WS_ENDPOINT: ""
+            TERMINOLGY_NOCONFIRMQUIT: "1"
 
     electron:start:
         desc: Run the Electron application directly.
@@ -40,10 +40,10 @@ tasks:
             - npm:install
             - build:backend
         env:
-            WAVETERM_ENVFILE: "{{.ROOT_DIR}}/.env"
-            WCLOUD_PING_ENDPOINT: "https://ping-dev.waveterm.dev/central"
-            WCLOUD_ENDPOINT: "https://api-dev.waveterm.dev/central"
-            WCLOUD_WS_ENDPOINT: "wss://wsapi-dev.waveterm.dev"
+            TERMINOLGY_ENVFILE: "{{.ROOT_DIR}}/.env"
+            WCLOUD_PING_ENDPOINT: ""
+            WCLOUD_ENDPOINT: ""
+            WCLOUD_WS_ENDPOINT: ""
 
     electron:quickdev:
         desc: Run the Electron application via the Vite dev server (quick dev - no docsite, arm64 only, no generate, no wsh).
@@ -52,11 +52,11 @@ tasks:
             - npm:install
             - build:backend:quickdev
         env:
-            WAVETERM_ENVFILE: "{{.ROOT_DIR}}/.env"
-            WCLOUD_PING_ENDPOINT: "https://ping-dev.waveterm.dev/central"
-            WCLOUD_ENDPOINT: "https://api-dev.waveterm.dev/central"
-            WCLOUD_WS_ENDPOINT: "wss://wsapi-dev.waveterm.dev/"
-            WAVETERM_NOCONFIRMQUIT: "1"
+            TERMINOLGY_ENVFILE: "{{.ROOT_DIR}}/.env"
+            WCLOUD_PING_ENDPOINT: ""
+            WCLOUD_ENDPOINT: ""
+            WCLOUD_WS_ENDPOINT: ""
+            TERMINOLGY_NOCONFIRMQUIT: "1"
 
     preview:
         desc: Run the standalone component preview server with HMR (no Electron, no backend).
@@ -79,10 +79,10 @@ tasks:
             - npm:install
             - build:backend:quickdev:windows
         env:
-            WAVETERM_ENVFILE: "{{.ROOT_DIR}}/.env"
-            WCLOUD_PING_ENDPOINT: "https://ping-dev.waveterm.dev/central"
-            WCLOUD_ENDPOINT: "https://api-dev.waveterm.dev/central"
-            WCLOUD_WS_ENDPOINT: "wss://wsapi-dev.waveterm.dev/"
+            TERMINOLGY_ENVFILE: "{{.ROOT_DIR}}/.env"
+            WCLOUD_PING_ENDPOINT: ""
+            WCLOUD_ENDPOINT: ""
+            WCLOUD_WS_ENDPOINT: ""
 
     docs:npm:install:
         desc: Runs `npm install` in docs directory
@@ -429,7 +429,7 @@ tasks:
             CHANNEL: '{{if contains "beta" .UP_VERSION}}beta{{else}}beta,stable{{end}}'
         cmd: |
             echo "Releasing to channels: [{{.CHANNEL}}]"
-            for file in waveterm_{{.UP_VERSION}}_*.snap; do
+            for file in terminolgy_{{.UP_VERSION}}_*.snap; do
                 echo "Publishing $file"
                 snapcraft upload --release={{.CHANNEL}} $file
                 echo "Finished publishing $file"
@@ -455,14 +455,14 @@ tasks:
               vars:
                   GOOS: darwin
                   GOARCH: arm64
-            - cp dist/bin/tsh-{{.VERSION}}-darwin.arm64 ~/Library/Application\ Support/waveterm-dev/bin/tsh
+            - cp dist/bin/tsh-{{.VERSION}}-darwin.arm64 ~/Library/Application\ Support/terminolgy-dev/bin/tsh
 
     dev:clearconfig:
-        desc: Clear the config directory for waveterm-dev
-        cmd: "{{.RMRF}} ~/.config/waveterm-dev"
+        desc: Clear the config directory for terminolgy-dev
+        cmd: "{{.RMRF}} ~/.config/terminolgy-dev"
 
     dev:cleardata:
-        desc: Clear the data directory for waveterm-dev
+        desc: Clear the data directory for terminolgy-dev
         cmds:
             - task: dev:cleardata:windows
             - task: dev:cleardata:linux
@@ -484,17 +484,17 @@ tasks:
     dev:cleardata:windows:
         internal: true
         platforms: [windows]
-        cmd: '{{.RMRF}} %LOCALAPPDATA%\waveterm-dev\Data'
+        cmd: '{{.RMRF}} %LOCALAPPDATA%\terminolgy-dev\Data'
 
     dev:cleardata:linux:
         internal: true
         platforms: [linux]
-        cmd: "rm -rf ~/.local/share/waveterm-dev"
+        cmd: "rm -rf ~/.local/share/terminolgy-dev"
 
     dev:cleardata:macos:
         internal: true
         platforms: [darwin]
-        cmd: 'rm -rf ~/Library/Application\ Support/waveterm-dev'
+        cmd: 'rm -rf ~/Library/Application\ Support/terminolgy-dev'
 
     npm:install:
         desc: Runs `npm install`

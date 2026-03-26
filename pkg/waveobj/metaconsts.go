@@ -128,7 +128,6 @@ const (
 	MetaKey_TermBellIndicator                = "term:bellindicator"
 	MetaKey_TermOsc52                        = "term:osc52"
 	MetaKey_TermDurable                      = "term:durable"
-	MetaKey_TermAiErrorAnalysis              = "term:aierroranalysis"
 
 	MetaKey_WebZoom                          = "web:zoom"
 	MetaKey_WebHideNav                       = "web:hidenav"

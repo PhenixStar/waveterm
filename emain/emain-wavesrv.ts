@@ -28,8 +28,8 @@ import { updater } from "./updater";
 
 let isWaveSrvDead = false;
 let waveSrvProc: child_process.ChildProcessWithoutNullStreams | null = null;
-let WaveVersion = "unknown"; // set by WAVESRV-ESTART
-let WaveBuildTime = 0; // set by WAVESRV-ESTART
+let WaveVersion = "unknown"; // set by TERMINOLGY-SRV-ESTART
+let WaveBuildTime = 0; // set by TERMINOLGY-SRV-ESTART
 
 export function getWaveVersion(): { version: string; buildTime: number } {
     return { version: WaveVersion, buildTime: WaveBuildTime };
@@ -106,12 +106,12 @@ export function runWaveSrv(handleWSEvent: (evtMsg: WSEventType) => void): Promis
         terminal: false,
     });
     rlStderr.on("line", (line) => {
-        if (line.includes("WAVESRV-ESTART")) {
+        if (line.includes("TERMINOLGY-SRV-ESTART")) {
             const startParams = /ws:([a-z0-9.:]+) web:([a-z0-9.:]+) version:([a-z0-9.-]+) buildtime:(\d+)/gm.exec(
                 line
             );
             if (startParams == null) {
-                console.log("error parsing WAVESRV-ESTART line", line);
+                console.log("error parsing TERMINOLGY-SRV-ESTART line", line);
                 setUserConfirmedQuit(true);
                 electron.app.quit();
                 return;
@@ -123,8 +123,8 @@ export function runWaveSrv(handleWSEvent: (evtMsg: WSEventType) => void): Promis
             waveSrvReadyResolve(true);
             return;
         }
-        if (line.startsWith("WAVESRV-EVENT:")) {
-            const evtJson = line.slice("WAVESRV-EVENT:".length);
+        if (line.startsWith("TERMINOLGY-SRV-EVENT:")) {
+            const evtJson = line.slice("TERMINOLGY-SRV-EVENT:".length);
             try {
                 const evtMsg: WSEventType = JSON.parse(evtJson);
                 handleWSEvent(evtMsg);

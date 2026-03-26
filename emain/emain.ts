@@ -79,7 +79,7 @@ console.log(
     )
 );
 if (isDev) {
-    console.log("waveterm-app WAVETERM_DEV set");
+    console.log("terminolgy-app TERMINOLGY_DEV set"); // REBRAND
 }
 
 function handleWSEvent(evtMsg: WSEventType) {
@@ -270,7 +270,7 @@ electronApp.on("before-quit", (e) => {
         !getUserConfirmedQuit() &&
         (allWindows.length > 0 || allBuilders.length > 0) &&
         !getIsWaveSrvDead() &&
-        !process.env.WAVETERM_NOCONFIRMQUIT
+        !process.env.TERMINOLGY_NOCONFIRMQUIT // REBRAND: was WAVETERM_NOCONFIRMQUIT
     ) {
         e.preventDefault();
         const choice = electron.dialog.showMessageBoxSync(null, {

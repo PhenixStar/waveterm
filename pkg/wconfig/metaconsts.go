@@ -59,6 +59,7 @@ const (
 	ConfigKey_TermBellIndicator              = "term:bellindicator"
 	ConfigKey_TermOsc52                      = "term:osc52"
 	ConfigKey_TermDurable                    = "term:durable"
+	ConfigKey_TermAiErrorAnalysis            = "term:aierroranalysis"
 	ConfigKey_TermCloseOnLastTermClose       = "term:closeonlasttermclose"
 
 	ConfigKey_EditorMinimapEnabled           = "editor:minimapenabled"
@@ -111,9 +112,18 @@ const (
 	ConfigKey_WindowSaveLastWindow           = "window:savelastwindow"
 	ConfigKey_WindowDimensions               = "window:dimensions"
 	ConfigKey_WindowZoom                     = "window:zoom"
+	ConfigKey_WindowAccentColor              = "window:accentcolor"
+	ConfigKey_WindowMarkdownFontFamily       = "window:markdownfontfamily"
+	ConfigKey_WindowMarkdownFontSize         = "window:markdownfontsize"
+	ConfigKey_WindowSysinfoCpuColor          = "window:sysinfocpucolor"
+	ConfigKey_WindowSysinfoMemColor          = "window:sysinfomemcolor"
+	ConfigKey_WindowSysinfoGpuColor          = "window:sysinfogpucolor"
 
 	ConfigKey_TelemetryClear                 = "telemetry:*"
 	ConfigKey_TelemetryEnabled               = "telemetry:enabled"
+
+	ConfigKey_BlockClear                     = "block:*"
+	ConfigKey_BlockCompactHeaders            = "block:compactheaders"
 
 	ConfigKey_ConnClear                      = "conn:*"
 	ConfigKey_ConnAskBeforeWshInstall        = "conn:askbeforewshinstall"

@@ -168,6 +168,9 @@
         "term:durable": {
           "type": "boolean"
         },
+        "term:aierroranalysis": {
+          "type": "boolean"
+        },
         "term:closeonlasttermclose": {
           "type": "boolean"
         },
@@ -304,10 +307,34 @@
         "window:zoom": {
           "type": "number"
         },
+        "window:accentcolor": {
+          "type": "string"
+        },
+        "window:markdownfontfamily": {
+          "type": "string"
+        },
+        "window:markdownfontsize": {
+          "type": "string"
+        },
+        "window:sysinfocpucolor": {
+          "type": "string"
+        },
+        "window:sysinfomemcolor": {
+          "type": "string"
+        },
+        "window:sysinfogpucolor": {
+          "type": "string"
+        },
         "telemetry:*": {
           "type": "boolean"
         },
         "telemetry:enabled": {
+          "type": "boolean"
+        },
+        "block:*": {
+          "type": "boolean"
+        },
+        "block:compactheaders": {
           "type": "boolean"
         },
         "conn:*": {

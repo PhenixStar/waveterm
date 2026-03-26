@@ -1085,7 +1085,6 @@ declare global {
         "frame:title"?: string;
         "frame:icon"?: string;
         "frame:text"?: string;
-        "frame:pinheader"?: boolean;
         "cmd:*"?: boolean;
         cmd?: string;
         "cmd:interactive"?: boolean;
@@ -1409,6 +1408,12 @@ declare global {
         "window:savelastwindow"?: boolean;
         "window:dimensions"?: string;
         "window:zoom"?: number;
+        "window:accentcolor"?: string;
+        "window:markdownfontfamily"?: string;
+        "window:markdownfontsize"?: string;
+        "window:sysinfocpucolor"?: string;
+        "window:sysinfomemcolor"?: string;
+        "window:sysinfogpucolor"?: string;
         "telemetry:*"?: boolean;
         "telemetry:enabled"?: boolean;
         "block:*"?: boolean;

@@ -4,9 +4,9 @@
 import * as electron from "electron";
 import { getWebServerEndpoint } from "../frontend/util/endpoints";
 
-export const WaveAppPathVarName = "WAVETERM_APP_PATH";
-export const WaveAppResourcesPathVarName = "WAVETERM_RESOURCES_PATH";
-export const WaveAppElectronExecPath = "WAVETERM_ELECTRONEXECPATH";
+export const WaveAppPathVarName = "TERMINOLGY_APP_PATH"; // REBRAND: was WAVETERM_APP_PATH
+export const WaveAppResourcesPathVarName = "TERMINOLGY_RESOURCES_PATH"; // REBRAND: was WAVETERM_RESOURCES_PATH
+export const WaveAppElectronExecPath = "TERMINOLGY_ELECTRONEXECPATH"; // REBRAND: was WAVETERM_ELECTRONEXECPATH
 
 const MinZoomLevel = 0.4;
 const MaxZoomLevel = 2.6;

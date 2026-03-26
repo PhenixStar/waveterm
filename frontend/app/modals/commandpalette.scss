@@ -3,7 +3,7 @@
 .cmd-overlay {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 10000;
     background: rgba(0, 0, 0, 0.55);
     display: flex;
     justify-content: center;
@@ -16,8 +16,8 @@
     width: 60%;
     max-width: 680px;
     min-width: 400px;
-    background: #1a1d27;
-    border: 1px solid #2d3148;
+    background: var(--main-bg-color);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
     display: flex;
@@ -32,11 +32,11 @@
     align-items: center;
     gap: 10px;
     padding: 12px 16px;
-    border-bottom: 1px solid #2d3148;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .cmd-search-icon {
-    color: #38bdf8;
+    color: var(--accent-color);
     font-size: 14px;
     flex-shrink: 0;
 }
@@ -46,19 +46,19 @@
     background: transparent;
     border: none;
     outline: none;
-    color: #e2e8f0;
+    color: var(--main-text-color);
     font-size: 14px;
     font-family: inherit;
 
     &::placeholder {
-        color: #5a627a;
+        color: var(--secondary-text-color);
     }
 }
 
 .cmd-clear {
     background: transparent;
     border: none;
-    color: #5a627a;
+    color: var(--secondary-text-color);
     cursor: pointer;
     padding: 2px 4px;
     font-size: 12px;
@@ -66,7 +66,7 @@
     align-items: center;
 
     &:hover {
-        color: #e2e8f0;
+        color: var(--main-text-color);
     }
 }
 
@@ -75,7 +75,7 @@
     display: flex;
     gap: 2px;
     padding: 8px 16px;
-    border-bottom: 1px solid #2d3148;
+    border-bottom: 1px solid var(--border-color);
     flex-wrap: wrap;
 }
 
@@ -88,17 +88,17 @@
     font-size: 11px;
     padding: 3px 10px;
     font-family: inherit;
-    transition: all 0.1s;
+    transition: background-color 0.1s, color 0.1s, border-color 0.1s;
 
     &:hover {
-        color: #e2e8f0;
-        border-color: #2d3148;
+        color: var(--main-text-color);
+        border-color: var(--border-color);
     }
 
     &--active {
         background: #22263a;
-        border-color: #38bdf8;
-        color: #38bdf8;
+        border-color: var(--accent-color);
+        color: var(--accent-color);
     }
 }
 
@@ -115,7 +115,7 @@
         background: transparent;
     }
     &::-webkit-scrollbar-thumb {
-        background: #2d3148;
+        background: var(--border-color);
         border-radius: 2px;
     }
 }
@@ -125,13 +125,13 @@
     align-items: center;
     gap: 10px;
     padding: 24px 20px;
-    color: #5a627a;
+    color: var(--secondary-text-color);
     font-size: 13px;
 }
 
 .cmd-empty-icon {
     font-size: 16px;
-    color: #38bdf8;
+    color: var(--accent-color);
     opacity: 0.5;
 }
 
@@ -142,7 +142,7 @@
     gap: 10px;
     padding: 8px 16px;
     cursor: pointer;
-    transition: background 0.08s;
+    transition: background-color 0.1s, color 0.1s, border-color 0.1s;
 
     &:hover,
     &--selected {
@@ -160,7 +160,7 @@
     flex-shrink: 0;
     font-size: 12px;
 
-    &--blocks  { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
+    &--blocks  { background: rgba(56, 189, 248, 0.12); color: var(--accent-color); }
     &--nav     { background: rgba(167, 139, 250, 0.12); color: #a78bfa; }
     &--settings { background: rgba(251, 191, 36, 0.12); color: #fbbf24; }
     &--ai      { background: rgba(52, 211, 153, 0.12); color: #34d399; }
@@ -180,7 +180,7 @@
 }
 
 .cmd-item-label {
-    color: #e2e8f0;
+    color: var(--main-text-color);
     font-size: 13px;
     white-space: nowrap;
     overflow: hidden;
@@ -188,7 +188,7 @@
 }
 
 .cmd-item-desc {
-    color: #5a627a;
+    color: var(--secondary-text-color);
     font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
@@ -202,7 +202,7 @@
     flex-shrink: 0;
     font-weight: 500;
 
-    &--blocks  { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    &--blocks  { background: rgba(56, 189, 248, 0.15); color: var(--accent-color); }
     &--nav     { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
     &--settings { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
     &--ai      { background: rgba(52, 211, 153, 0.15); color: #34d399; }
@@ -211,9 +211,9 @@
 
 .cmd-shortcut {
     font-size: 10px;
-    color: #5a627a;
+    color: var(--secondary-text-color);
     background: #12151f;
-    border: 1px solid #2d3148;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 2px 6px;
     flex-shrink: 0;
@@ -222,7 +222,7 @@
 
 .cmd-highlight {
     background: transparent;
-    color: #38bdf8;
+    color: var(--accent-color);
     font-weight: 600;
 }
 
@@ -232,13 +232,13 @@
     align-items: center;
     gap: 14px;
     padding: 8px 16px;
-    border-top: 1px solid #2d3148;
-    color: #5a627a;
+    border-top: 1px solid var(--border-color);
+    color: var(--secondary-text-color);
     font-size: 11px;
 
     kbd {
         background: #12151f;
-        border: 1px solid #2d3148;
+        border: 1px solid var(--border-color);
         border-radius: 3px;
         padding: 1px 5px;
         font-size: 10px;

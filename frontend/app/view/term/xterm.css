@@ -290,8 +290,8 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 10;
-    background: var(--block-bg-color, #1e1e1e);
+    z-index: 15;
+    background: var(--block-bg-color, #222222);
     border-bottom: 1px solid var(--border-color, #444);
     font-size: 12px;
     max-height: 50vh;
@@ -331,7 +331,7 @@
 }
 
 .term-ai-error-btn {
-    background: var(--accent-color, #5b8dd9);
+    background: var(--accent-color, rgb(88, 193, 66));
     color: #fff;
     border: none;
     border-radius: 3px;
@@ -374,7 +374,7 @@
 
 .term-ai-error-apply {
     margin-top: 6px;
-    background: var(--accent-color, #5b8dd9);
+    background: var(--accent-color, rgb(88, 193, 66));
     color: #fff;
     border: none;
     border-radius: 3px;

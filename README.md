@@ -1,12 +1,22 @@
 <p align="center">
+  <img src="public/logos/terminolgy-logo-256.png" alt="Terminolgy" width="96" />
   <h1 align="center">Terminolgy</h1>
   <p align="center">Sleek AI-powered terminal. Cross-platform. Intelligent.</p>
 </p>
 
 <p align="center">
+  <a href="https://github.com/PhenixStar/terminolgy/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License: Apache-2.0" /></a>
+  <a href="#install"><img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform: Windows / macOS / Linux" /></a>
+  <a href="https://github.com/PhenixStar/terminolgy/releases"><img src="https://img.shields.io/github/v/release/PhenixStar/terminolgy" alt="Latest Release" /></a>
+</p>
+
+<p align="center">
   <a href="https://terminolgy.io">Website</a> ·
   <a href="https://docs.terminolgy.io">Docs</a> ·
-  <a href="https://github.com/PhenixStar/terminolgy/releases">Download</a>
+  <a href="https://github.com/PhenixStar/terminolgy/releases">Download</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a> ·
+  <a href="SECURITY.md">Security</a> ·
+  <a href="docs/roadmap.md">Roadmap</a>
 </p>
 
 ---
@@ -34,7 +44,7 @@ Download the latest [MSI installer](https://github.com/PhenixStar/terminolgy/rel
 
 ### macOS / Linux
 
-Coming soon — build from source (see [Building](#building-from-source)).
+Build from source — see [BUILD.md](BUILD.md) for full instructions.
 
 ## Building from Source
 

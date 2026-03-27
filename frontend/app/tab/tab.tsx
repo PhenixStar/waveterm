@@ -44,6 +44,7 @@ interface TabVProps {
     flagColor?: string | null;
     connection?: string | null;
     onClick: () => void;
+    onMouseEnter?: () => void;
     onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null) => void;
     onDragStart: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
     onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -65,6 +66,7 @@ const TabV = forwardRef<HTMLDivElement, TabVProps>((props, ref) => {
         flagColor,
         connection,
         onClick,
+        onMouseEnter,
         onClose,
         onDragStart,
         onContextMenu,
@@ -190,6 +192,7 @@ const TabV = forwardRef<HTMLDivElement, TabVProps>((props, ref) => {
             })}
             onMouseDown={onDragStart}
             onClick={onClick}
+            onMouseEnter={onMouseEnter}
             onContextMenu={onContextMenu}
             data-tab-id={tabId}
         >
@@ -237,13 +240,14 @@ interface TabProps {
     tabWidth: number;
     isNew: boolean;
     onSelect: () => void;
+    onMouseEnter?: () => void;
     onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null) => void;
     onDragStart: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
     onLoaded: () => void;
 }
 
 const TabInner = forwardRef<HTMLDivElement, TabProps>((props, ref) => {
-    const { id, active, showDivider, isDragging, tabWidth, isNew, onLoaded, onSelect, onClose, onDragStart } = props;
+    const { id, active, showDivider, isDragging, tabWidth, isNew, onLoaded, onSelect, onMouseEnter, onClose, onDragStart } = props;
     const env = useWaveEnv<TabEnv>();
     const [tabData, _] = env.wos.useWaveObjectValue<Tab>(makeORef("tab", id));
     const badges = useAtomValue(getTabBadgeAtom(id, env));
@@ -308,6 +312,7 @@ const TabInner = forwardRef<HTMLDivElement, TabProps>((props, ref) => {
             flagColor={flagColor}
             connection={connection}
             onClick={handleTabClick}
+            onMouseEnter={onMouseEnter}
             onClose={onClose}
             onDragStart={onDragStart}
             onContextMenu={handleContextMenu}

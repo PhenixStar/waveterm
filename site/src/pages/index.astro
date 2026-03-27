@@ -4,48 +4,49 @@ import Base from '../layouts/Base.astro';
 
 <Base>
   <div class="page">
-    <!-- Nav -->
+
+    <!-- ── 1. Sticky Nav ── -->
     <nav class="nav">
       <div class="nav-inner">
-        <span class="logo">Terminolgy</span>
+        <a href="https://terminolgy.io" class="logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+          Terminolgy
+        </a>
         <div class="nav-links">
-          <a href="https://github.com/terminolgy/terminolgy" target="_blank" rel="noopener">GitHub</a>
-          <a href="/docs">Docs</a>
-          <a href="#download" class="btn btn-sm">Download</a>
+          <a href="https://terminolgy.io/docs" class="nav-link">Docs</a>
+          <a href="https://github.com/PhenixStar/Terminlogy" class="nav-link" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/PhenixStar/Terminlogy/releases" class="btn btn-primary btn-sm" target="_blank" rel="noopener">Download</a>
         </div>
       </div>
     </nav>
 
-    <!-- Hero -->
+    <!-- ── 2. Hero ── -->
     <section class="hero">
-      <div class="hero-inner">
-        <div class="badge">v1.0 — Now Available</div>
-        <h1 class="hero-title">
-          The terminal that<br /><span class="gradient-text">thinks with you</span>
-        </h1>
-        <p class="hero-sub">
-          Terminolgy is a sleek, AI-powered terminal built for engineers who move fast.
-          GPU telemetry, intelligent error analysis, multi-machine dashboards — all in one pane.
-        </p>
-        <div class="hero-ctas" id="download">
-          <a href="#" class="btn btn-primary">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z"/>
-            </svg>
-            Download for macOS
-          </a>
-          <a href="#" class="btn btn-secondary">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+      <div class="hero-text">
+        <div class="badge">v1.0 — Now Available for Windows</div>
+        <h1>Terminolgy</h1>
+        <p class="hero-tagline">Sleek AI-powered terminal. Cross-platform. Intelligent.</p>
+        <div class="hero-ctas">
+          <a href="https://github.com/PhenixStar/Terminlogy/releases" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M0 13.772l6.545 1.9V8.941H0zM0 8.26h6.545V2.228L0 4.13zm7.265 7.526L16 18V8.94H7.265zm0-13.786v5.26H16V0z"/>
             </svg>
             Download for Windows
           </a>
-          <a href="#" class="btn btn-ghost">Linux packages</a>
+          <a href="https://github.com/PhenixStar/Terminlogy" class="btn btn-ghost" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+            </svg>
+            View on GitHub
+          </a>
         </div>
-        <p class="hero-note">Free and open source. Works on macOS, Windows, Linux.</p>
+        <p class="hero-note">Free and open source · Apache-2.0 · macOS &amp; Linux coming soon</p>
       </div>
 
-      <!-- Terminal demo placeholder -->
+      <!-- Terminal mockup -->
       <div class="demo-wrap">
         <div class="demo-chrome">
           <div class="chrome-dots">
@@ -56,172 +57,353 @@ import Base from '../layouts/Base.astro';
           <span class="chrome-title">terminolgy — bash</span>
         </div>
         <div class="demo-body">
-          <div class="term-line"><span class="prompt">~</span> <span class="cmd">gpu status</span></div>
-          <div class="term-output gpu-output">
-            <div class="gpu-bar">
-              <span class="gpu-label">GPU 0 — NVIDIA A100</span>
-              <span class="gpu-util" style="color: #10b981">82% util</span>
-            </div>
-            <div class="progress-track"><div class="progress-fill" style="width: 82%; background: #10b981"></div></div>
-            <div class="gpu-mem">VRAM 54.2 / 80 GB &nbsp;|&nbsp; Temp 71°C &nbsp;|&nbsp; Power 312W</div>
-          </div>
-          <div class="term-line mt"><span class="prompt">~</span> <span class="cmd">ai analyze --last-error</span></div>
-          <div class="term-output ai-output">
+          <div class="term-line"><span class="prompt">❯</span> <span class="cmd">cd ~/projects/api-service</span></div>
+          <div class="term-line"><span class="prompt">❯</span> <span class="cmd">python main.py</span></div>
+          <div class="term-output muted">Starting server on port 3000...</div>
+          <div class="term-output error">Error: Connection refused — database unreachable</div>
+          <div class="term-output ai-block">
             <span class="ai-tag">AI</span>
-            <span class="ai-text">CUDA OOM on layer 34. Reduce batch size or enable gradient checkpointing.</span>
+            <span class="ai-text">PostgreSQL connection failed. Check if the database server is running and credentials in .env are correct. Run <code>pg_isready</code> to verify.</span>
           </div>
-          <div class="term-line mt"><span class="prompt">~</span> <span class="cursor">_</span></div>
+          <div class="term-line mt"><span class="prompt">❯</span> <span class="cmd">gpu status</span></div>
+          <div class="term-output">
+            <div class="gpu-bar"><span class="muted">GPU 0 — NVIDIA A100</span><span style="color:#10b981">82% util</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:82%;background:#10b981"></div></div>
+            <div class="muted-sm">VRAM 54.2 / 80 GB &nbsp;|&nbsp; Temp 71°C &nbsp;|&nbsp; Power 312W</div>
+          </div>
+          <div class="term-line mt"><span class="prompt">❯</span> <span class="cursor">_</span></div>
         </div>
       </div>
     </section>
 
-    <!-- Features -->
-    <section class="features" id="features">
+    <!-- ── 3. Feature Grid (6 cards) ── -->
+    <section class="section features-primary" id="features">
       <div class="section-inner">
         <h2 class="section-title">Everything your workflow needs</h2>
         <p class="section-sub">Six purpose-built panels. One terminal.</p>
         <div class="feature-grid">
+
           <div class="feature-card">
-            <div class="feature-icon" style="color: #10b981">
+            <div class="feature-icon" style="color:#10b981">
               <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
               </svg>
             </div>
-            <h3>GPU Sysinfo</h3>
-            <p>Real-time VRAM, utilisation, temperature, and power draw across all GPUs in the node.</p>
+            <h3>GPU Sysinfo Monitoring</h3>
+            <p>Real-time VRAM, utilisation, temperature, and power draw across all GPUs. NVIDIA CUDA and AMD ROCm support with historical graphs and configurable alert thresholds so you catch runaway processes before they OOM.</p>
           </div>
+
           <div class="feature-card">
-            <div class="feature-icon" style="color: #8b5cf6">
+            <div class="feature-icon" style="color:#8b5cf6">
               <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/>
               </svg>
             </div>
-            <h3>AI Error Analysis</h3>
-            <p>Paste or pipe any error and get a concise root-cause summary with actionable fixes — powered by local or cloud LLMs.</p>
+            <div class="card-title-row">
+              <h3>AI Error Analysis</h3>
+              <kbd>Ctrl+Shift+F</kbd>
+            </div>
+            <p>Instant AI-powered debugging of errors, exceptions, and failed commands. Get root-cause analysis and actionable fix suggestions — powered by local or cloud LLMs — without leaving your terminal.</p>
           </div>
+
           <div class="feature-card">
-            <div class="feature-icon" style="color: #06b6d4">
+            <div class="feature-icon" style="color:#06b6d4">
               <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M4 6h16M4 12h10M4 18h7"/>
               </svg>
             </div>
-            <h3>Command Palette</h3>
-            <p>Fuzzy-search every command, bookmark, and session from a single keystroke. No more hunting through history.</p>
+            <div class="card-title-row">
+              <h3>Command Palette</h3>
+              <kbd>Ctrl+Shift+P</kbd>
+            </div>
+            <p>Fuzzy-search every command, bookmark, and AI action from a single keystroke. Navigate your entire workflow without lifting your hands from the keyboard.</p>
           </div>
+
           <div class="feature-card">
-            <div class="feature-icon" style="color: #f59e0b">
+            <div class="feature-icon" style="color:#f59e0b">
               <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
                 <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
               </svg>
             </div>
             <h3>Multi-Machine Dashboard</h3>
-            <p>Tile SSH sessions and remote metrics side-by-side. Switch context without losing any pane.</p>
+            <p>Connect to multiple remote machines simultaneously. Monitor CPU, memory, and process trees across your entire infrastructure from a unified tiled view. Switch context without losing any pane.</p>
           </div>
+
           <div class="feature-card">
-            <div class="feature-icon" style="color: #06b6d4">
+            <div class="feature-icon" style="color:#06b6d4">
               <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
               </svg>
             </div>
-            <h3>Docker Panel</h3>
-            <p>List, exec, log-tail, and restart containers inline. No separate Docker Desktop needed.</p>
+            <h3>Docker Orchestration Panel</h3>
+            <p>Full Docker and Docker Compose management with live container logs, stats, and one-click exec. Manage multi-container applications visually without leaving your terminal session.</p>
           </div>
+
           <div class="feature-card">
-            <div class="feature-icon" style="color: #10b981">
+            <div class="feature-icon" style="color:#10b981">
               <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="3"/><circle cx="4" cy="6" r="2"/><circle cx="20" cy="6" r="2"/>
                 <circle cx="4" cy="18" r="2"/><circle cx="20" cy="18" r="2"/>
                 <path d="M6 6h4M14 6h4M6 18h4M14 18h4M12 9v3M12 12l-6 4M12 12l6 4"/>
               </svg>
             </div>
-            <h3>Network Topology</h3>
-            <p>Live graph of your LAN — devices, latency, and link states visualised without any agent install.</p>
+            <h3>Network Topology Visualizer</h3>
+            <p>Auto-discover and map your LAN infrastructure. Visual representation of device connections, latency, and link states — no agent install required on remote nodes.</p>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- Platform support -->
-    <section class="platforms">
+    <!-- ── 4. Secondary Features (7 cards) ── -->
+    <section class="section features-secondary">
       <div class="section-inner">
-        <h2 class="section-title">Runs everywhere</h2>
-        <div class="platform-row">
-          <div class="platform-badge">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14.5v-9l7 4.5-7 4.5z"/>
-            </svg>
-            macOS 13+
+        <h2 class="section-title">Additional Capabilities</h2>
+        <p class="section-sub">Powerful tools built in, not bolted on</p>
+        <div class="secondary-grid">
+
+          <div class="secondary-card">
+            <div class="secondary-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Built-in Browser</h3>
+              <p>Browse documentation, REST APIs, and dashboards without switching windows. Rendered inline next to your terminal pane.</p>
+            </div>
           </div>
-          <div class="platform-badge">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 5h18v14H3V5zm2 2v10h14V7H5zm2 2h4v2H7V9zm6 0h4v2h-4V9zm-6 4h4v2H7v-2zm6 0h4v2h-4v-2z"/>
-            </svg>
-            Windows 10+
+
+          <div class="secondary-card">
+            <div class="secondary-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M5 12H3a9 9 0 1 0 18 0h-2"/><path d="M12 3v9"/>
+              </svg>
+            </div>
+            <div>
+              <h3>SSH Integration + tsh</h3>
+              <p>Seamless SSH sessions with tsh support for Teleport-secured clusters. Manage keys, jump hosts, and tunnels from one interface.</p>
+            </div>
           </div>
-          <div class="platform-badge">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14.93V15h-2v1.93A8.001 8.001 0 0 1 4.07 9H6v-2H4.07A8.001 8.001 0 0 1 11 3.07V5h2V3.07A8.001 8.001 0 0 1 19.93 7H18v2h1.93A8.001 8.001 0 0 1 13 16.93z"/>
-            </svg>
-            Linux (deb, rpm, AppImage, Snap)
+
+          <div class="secondary-card">
+            <div class="secondary-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M4 6h16M4 10h16M4 14h8"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Compact Block Headers</h3>
+              <p>Collapsible output blocks keep long command results tidy. Expand only what you need — scroll history stays clean.</p>
+            </div>
+          </div>
+
+          <div class="secondary-card">
+            <div class="secondary-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div>
+              <h3>CSS Theme Variables</h3>
+              <p>Full theming via CSS custom properties. Ship your own colour scheme or share community themes — no recompile needed.</p>
+            </div>
+          </div>
+
+          <div class="secondary-card">
+            <div class="secondary-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Config Validation CLI</h3>
+              <p>Validate YAML, TOML, JSON, and NGINX configs before deployment. Catch schema errors and misconfigurations early in CI or locally.</p>
+            </div>
+          </div>
+
+          <div class="secondary-card">
+            <div class="secondary-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Workspace System</h3>
+              <p>Project-based workspaces with saved pane layouts, active sessions, and environment variables. Switch projects in one keystroke.</p>
+            </div>
+          </div>
+
+          <div class="secondary-card">
+            <div class="secondary-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Remote Browse via SSH Tunnel</h3>
+              <p>Browse remote filesystems and web UIs through secure SSH tunnels. Access internal dashboards without VPN configuration.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 5. Download Section ── -->
+    <section class="section download" id="download">
+      <div class="section-inner">
+        <h2 class="section-title">Download Terminolgy</h2>
+        <p class="section-sub">Get started in under a minute</p>
+        <div class="download-grid">
+
+          <div class="download-card download-card--active">
+            <div class="dl-badge">Available Now</div>
+            <div class="dl-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" opacity="0.8">
+                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+              </svg>
+            </div>
+            <h3>Windows</h3>
+            <p>Windows 10 and later, x64</p>
+            <div class="dl-options">
+              <a href="https://github.com/PhenixStar/Terminlogy/releases" class="btn btn-primary" target="_blank" rel="noopener">MSI Installer</a>
+              <a href="https://github.com/PhenixStar/Terminlogy/releases" class="btn btn-ghost dl-alt" target="_blank" rel="noopener">EXE · ZIP</a>
+            </div>
+          </div>
+
+          <div class="download-card download-card--soon">
+            <div class="dl-badge dl-badge--soon">Coming Soon</div>
+            <div class="dl-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" opacity="0.4">
+                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 14.5v-9l7 4.5-7 4.5z"/>
+              </svg>
+            </div>
+            <h3>macOS</h3>
+            <p>macOS 13 Ventura and later</p>
+            <button class="btn btn-ghost" disabled>Coming Soon</button>
+          </div>
+
+          <div class="download-card download-card--soon">
+            <div class="dl-badge dl-badge--soon">Coming Soon</div>
+            <div class="dl-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" opacity="0.4">
+                <path d="M12.504 0c-.155 0-.315.008-.48.021C7.576.191 3.508 2.777 1.894 6.483c-.813 1.838-1.04 3.886-.65 5.846.392 1.96 1.39 3.734 2.84 5.08.73.67 1.564 1.227 2.466 1.638.903.41 1.86.673 2.838.783 1.004.115 2.024.083 3.016-.088.993-.172 1.963-.49 2.858-.948.892-.458 1.718-1.063 2.44-1.804 1.44-1.48 2.355-3.43 2.605-5.479.25-2.049-.17-4.143-1.195-5.94C17.42.97 14.97-.02 12.504 0z"/>
+              </svg>
+            </div>
+            <h3>Linux</h3>
+            <p>AppImage · deb · rpm · Snap</p>
+            <button class="btn btn-ghost" disabled>Coming Soon</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. Open Source Section ── -->
+    <section class="section open-source">
+      <div class="section-inner open-source-inner">
+        <div class="oss-text">
+          <h2 class="section-title left">Built on Wave Terminal</h2>
+          <p>Terminolgy extends the open-source <a href="https://waveterm.dev" target="_blank" rel="noopener" class="link">Wave Terminal</a> architecture with custom AI capabilities, GPU telemetry, and enhanced developer tooling. We believe in building in the open.</p>
+          <div class="oss-badges">
+            <a href="https://github.com/PhenixStar/Terminlogy" class="oss-badge" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+              </svg>
+              PhenixStar/Terminlogy
+            </a>
+            <span class="oss-badge">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
+              Apache-2.0 License
+            </span>
+            <span class="oss-badge">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              ★ Star on GitHub
+            </span>
+          </div>
+        </div>
+        <div class="oss-code">
+          <div class="demo-chrome">
+            <div class="chrome-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <span class="chrome-title">LICENSE</span>
+          </div>
+          <div class="demo-body oss-license">
+            <div class="muted-sm">Apache License, Version 2.0</div>
+            <div class="muted-sm mt-sm">Copyright 2025 Nulled AI</div>
+            <div class="muted-sm mt-sm">Built on Wave Terminal</div>
+            <div class="muted-sm">Copyright 2024 Dashborg Inc.</div>
+            <div class="muted-sm mt-sm" style="color:#06b6d4">Licensed under the Apache License, Version 2.0</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Footer -->
+    <!-- ── 7. Footer ── -->
     <footer class="footer">
       <div class="footer-inner">
-        <span class="footer-logo">Terminolgy</span>
+        <a href="https://terminolgy.io" class="footer-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+          Terminolgy
+        </a>
         <div class="footer-links">
-          <a href="https://github.com/terminolgy/terminolgy" target="_blank" rel="noopener">GitHub</a>
-          <a href="/docs">Docs</a>
-          <a href="#download">Download</a>
-          <a href="https://github.com/terminolgy/terminolgy/releases" target="_blank" rel="noopener">Releases</a>
+          <a href="https://github.com/PhenixStar/Terminlogy" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://terminolgy.io/docs">Docs</a>
+          <a href="https://github.com/PhenixStar/Terminlogy/releases" target="_blank" rel="noopener">Releases</a>
+          <a href="https://github.com/PhenixStar/Terminlogy/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
         </div>
-        <p class="footer-copy">MIT License &copy; 2025 Terminolgy contributors</p>
+        <p class="footer-copy">Built by <a href="https://nulled.ai" target="_blank" rel="noopener" class="link">Nulled AI</a> &nbsp;·&nbsp; Apache-2.0 &copy; 2025</p>
       </div>
     </footer>
+
   </div>
 </Base>
 
 <style>
-  /* ---- Reset / Base ---- */
+  /* ── Reset ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :global(html) {
-    scroll-behavior: smooth;
-    font-size: 16px;
-  }
-
+  :global(html) { scroll-behavior: smooth; font-size: 16px; }
   :global(body) {
-    background: #0a0a12;
+    background: #0a0a0a;
     color: #e2e8f0;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
-
   a { color: inherit; text-decoration: none; }
 
-  /* ---- Custom properties ---- */
+  /* ── Design tokens ── */
   .page {
-    --cyan: #06b6d4;
-    --purple: #8b5cf6;
-    --green: #10b981;
-    --amber: #f59e0b;
-    --surface: #0f0f1a;
-    --surface-2: #161625;
-    --border: rgba(255,255,255,0.08);
-    --text-muted: #94a3b8;
+    --cyan:     #06b6d4;
+    --purple:   #8b5cf6;
+    --green:    #10b981;
+    --amber:    #f59e0b;
+    --surface:  #111111;
+    --surface2: #161620;
+    --border:   #222222;
+    --muted:    #94a3b8;
+    --r-card:   12px;
+    --r-btn:    8px;
   }
 
-  /* ---- Nav ---- */
+  /* ── Nav ── */
   .nav {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(10, 10, 18, 0.85);
+    background: rgba(10,10,10,0.88);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
@@ -235,6 +417,9 @@ import Base from '../layouts/Base.astro';
     justify-content: space-between;
   }
   .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 1.1rem;
     font-weight: 700;
     background: linear-gradient(90deg, var(--cyan), var(--purple));
@@ -248,51 +433,43 @@ import Base from '../layouts/Base.astro';
     align-items: center;
     font-size: 0.9rem;
   }
-  .nav-links a { color: var(--text-muted); transition: color 0.15s; }
-  .nav-links a:hover { color: #fff; }
+  .nav-link { color: var(--muted); transition: color 0.15s; }
+  .nav-link:hover { color: #fff; }
 
-  /* ---- Buttons ---- */
+  /* ── Buttons ── */
   .btn {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     padding: 0.65rem 1.25rem;
-    border-radius: 8px;
+    border-radius: var(--r-btn);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
     transition: opacity 0.15s, transform 0.1s;
     white-space: nowrap;
+    border: none;
   }
-  .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn:not(:disabled):hover { opacity: 0.85; transform: translateY(-1px); }
+  .btn:disabled { cursor: not-allowed; opacity: 0.45; }
   .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.85rem; }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    color: #fff;
-  }
-  .btn-secondary {
-    background: var(--surface-2);
-    color: #fff;
-    border: 1px solid var(--border);
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-  }
+  .btn-primary { background: linear-gradient(135deg, var(--cyan), var(--purple)); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .dl-alt { padding: 0.55rem 1rem; font-size: 0.82rem; }
 
-  /* ---- Hero ---- */
+  /* ── Hero ── */
   .hero {
     max-width: 1120px;
     margin: 0 auto;
     padding: 5rem 1.5rem 4rem;
     display: grid;
     gap: 3rem;
+    align-items: start;
   }
   @media (min-width: 900px) {
-    .hero { grid-template-columns: 1fr 1fr; align-items: start; }
+    .hero { grid-template-columns: 1fr 1.1fr; }
   }
-  .hero-inner { display: flex; flex-direction: column; gap: 1.5rem; }
+  .hero-text { display: flex; flex-direction: column; gap: 1.5rem; }
 
   .badge {
     display: inline-block;
@@ -300,50 +477,41 @@ import Base from '../layouts/Base.astro';
     border-radius: 999px;
     font-size: 0.78rem;
     font-weight: 600;
-    border: 1px solid rgba(6, 182, 212, 0.4);
+    border: 1px solid rgba(6,182,212,0.4);
     color: var(--cyan);
-    background: rgba(6, 182, 212, 0.08);
+    background: rgba(6,182,212,0.08);
     width: fit-content;
   }
 
-  .hero-title {
-    font-size: clamp(2.4rem, 5vw, 3.5rem);
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
     font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-  .gradient-text {
-    background: linear-gradient(90deg, var(--cyan) 0%, var(--purple) 60%);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--purple) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .hero-sub {
-    font-size: 1.05rem;
-    color: var(--text-muted);
-    max-width: 480px;
-    line-height: 1.75;
+  .hero-tagline {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 440px;
+    line-height: 1.7;
   }
-  .hero-ctas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  .hero-note {
-    font-size: 0.8rem;
-    color: #64748b;
-  }
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .hero-note { font-size: 0.78rem; color: #475569; }
 
-  /* ---- Terminal demo ---- */
+  /* ── Terminal demo ── */
   .demo-wrap {
-    border-radius: 12px;
+    border-radius: var(--r-card);
     overflow: hidden;
     border: 1px solid var(--border);
     background: var(--surface);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55);
   }
   .demo-chrome {
-    background: #1e1e2e;
+    background: #1a1a2e;
     padding: 0.6rem 1rem;
     display: flex;
     align-items: center;
@@ -352,47 +520,56 @@ import Base from '../layouts/Base.astro';
   }
   .chrome-dots { display: flex; gap: 6px; }
   .dot { width: 12px; height: 12px; border-radius: 50%; }
-  .dot-red { background: #ff5f57; }
+  .dot-red    { background: #ff5f57; }
   .dot-yellow { background: #febc2e; }
-  .dot-green { background: #28c840; }
-  .chrome-title { font-size: 0.78rem; color: #64748b; margin-left: auto; }
+  .dot-green  { background: #28c840; }
+  .chrome-title { font-size: 0.75rem; color: #475569; margin-left: auto; }
 
   .demo-body {
     padding: 1.25rem 1.5rem;
     font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     line-height: 1.6;
   }
   .term-line { display: flex; gap: 0.5rem; align-items: center; }
-  .term-line.mt { margin-top: 1rem; }
+  .term-line.mt { margin-top: 0.9rem; }
   .prompt { color: var(--cyan); font-weight: 700; }
   .cmd { color: #e2e8f0; }
   .cursor { color: var(--cyan); animation: blink 1.2s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
-  .term-output { margin-top: 0.4rem; padding-left: 1rem; }
+  .term-output { margin-top: 0.35rem; padding-left: 1.2rem; }
+  .muted    { color: var(--muted); font-size: 0.78rem; }
+  .muted-sm { color: #475569;     font-size: 0.75rem; }
+  .mt-sm    { margin-top: 0.35rem; }
+  .error    { color: #f87171; font-size: 0.78rem; }
 
-  .gpu-bar { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.3rem; }
-  .gpu-label { color: var(--text-muted); }
-  .progress-track { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; }
-  .progress-fill { height: 100%; border-radius: 2px; }
-  .gpu-mem { font-size: 0.75rem; color: #64748b; margin-top: 0.3rem; }
-
-  .ai-output { display: flex; gap: 0.5rem; align-items: flex-start; }
+  .ai-block {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    padding-left: 1.2rem;
+    margin-top: 0.3rem;
+  }
   .ai-tag {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 700;
-    padding: 0.15rem 0.4rem;
+    padding: 0.12rem 0.38rem;
     border-radius: 4px;
-    background: rgba(139, 92, 246, 0.25);
+    background: rgba(139,92,246,0.25);
     color: var(--purple);
     flex-shrink: 0;
     margin-top: 0.1rem;
   }
-  .ai-text { color: #cbd5e1; font-size: 0.8rem; }
+  .ai-text { color: #cbd5e1; font-size: 0.78rem; }
+  .ai-text code { color: var(--cyan); background: rgba(6,182,212,0.1); padding: 0.05rem 0.3rem; border-radius: 3px; }
 
-  /* ---- Features ---- */
-  .features { padding: 5rem 1.5rem; }
+  .gpu-bar { display: flex; justify-content: space-between; font-size: 0.76rem; margin-bottom: 0.25rem; }
+  .progress-track { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; }
+  .progress-fill  { height: 100%; border-radius: 2px; }
+
+  /* ── Sections ── */
+  .section { padding: 5rem 1.5rem; }
   .section-inner { max-width: 1120px; margin: 0 auto; }
   .section-title {
     font-size: clamp(1.8rem, 3vw, 2.4rem);
@@ -400,64 +577,155 @@ import Base from '../layouts/Base.astro';
     text-align: center;
     letter-spacing: -0.02em;
   }
+  .section-title.left { text-align: left; }
   .section-sub {
     text-align: center;
-    color: var(--text-muted);
+    color: var(--muted);
     margin-top: 0.5rem;
+    margin-bottom: 3rem;
     font-size: 1rem;
   }
 
+  /* ── Feature Grid (6) ── */
+  .features-primary { border-top: 1px solid var(--border); }
   .feature-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.25rem;
-    margin-top: 3rem;
   }
   .feature-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--r-card);
     padding: 1.75rem;
     transition: border-color 0.2s, transform 0.15s;
   }
   .feature-card:hover {
-    border-color: rgba(255,255,255,0.16);
+    border-color: rgba(6,182,212,0.4);
+    box-shadow: 0 0 28px rgba(6,182,212,0.06);
     transform: translateY(-2px);
   }
   .feature-icon { margin-bottom: 1rem; }
-  .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
-  .feature-card p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.65; }
-
-  /* ---- Platforms ---- */
-  .platforms {
-    padding: 3rem 1.5rem 5rem;
-    border-top: 1px solid var(--border);
-  }
-  .platform-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 2rem;
-  }
-  .platform-badge {
+  .card-title-row {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    background: var(--surface-2);
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .card-title-row h3 { margin-bottom: 0; }
+  .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .feature-card p  { font-size: 0.875rem; color: var(--muted); line-height: 1.65; }
+  kbd {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    background: #0a0a0a;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.75rem 1.25rem;
-    font-size: 0.9rem;
-    color: var(--text-muted);
+    color: var(--cyan);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    white-space: nowrap;
   }
-  .platform-badge svg { opacity: 0.6; }
 
-  /* ---- Footer ---- */
-  .footer {
-    border-top: 1px solid var(--border);
-    padding: 2rem 1.5rem;
+  /* ── Secondary Features (7) ── */
+  .features-secondary { background: rgba(17,17,17,0.6); }
+  .secondary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
   }
+  .secondary-card {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: border-color 0.2s;
+  }
+  .secondary-card:hover { border-color: rgba(139,92,246,0.45); }
+  .secondary-icon { color: var(--muted); flex-shrink: 0; margin-top: 0.1rem; }
+  .secondary-card h3 { font-size: 0.92rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .secondary-card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── Download ── */
+  .download { border-top: 1px solid var(--border); }
+  .download-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .download-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    padding: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    transition: border-color 0.2s;
+  }
+  .download-card--active { border-color: rgba(6,182,212,0.35); }
+  .download-card--active:hover { border-color: var(--cyan); }
+  .download-card--soon { opacity: 0.55; }
+  .dl-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(16,185,129,0.15);
+    color: var(--green);
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+  .dl-badge--soon {
+    background: rgba(139,92,246,0.15);
+    color: var(--purple);
+    border-color: rgba(139,92,246,0.3);
+  }
+  .dl-icon { margin: 0.5rem 0; }
+  .download-card h3 { font-size: 1.15rem; font-weight: 600; }
+  .download-card p  { font-size: 0.85rem; color: var(--muted); }
+  .dl-options { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; width: 100%; }
+  .dl-options .btn { width: 100%; justify-content: center; }
+
+  /* ── Open Source ── */
+  .open-source { background: rgba(17,17,17,0.5); border-top: 1px solid var(--border); }
+  .open-source-inner {
+    display: grid;
+    gap: 3rem;
+    align-items: start;
+  }
+  @media (min-width: 860px) {
+    .open-source-inner { grid-template-columns: 1fr 1fr; }
+  }
+  .oss-text { display: flex; flex-direction: column; gap: 1.25rem; }
+  .oss-text p { font-size: 0.95rem; color: var(--muted); line-height: 1.75; }
+  .link { color: var(--cyan); }
+  .link:hover { text-decoration: underline; }
+  .oss-badges { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .oss-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .oss-badge:hover { border-color: var(--cyan); color: #fff; }
+  .oss-code { border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--border); }
+  .oss-license { background: #0a0a0a; }
+
+  /* ── Footer ── */
+  .footer { border-top: 1px solid var(--border); padding: 2.5rem 1.5rem; }
   .footer-inner {
     max-width: 1120px;
     margin: 0 auto;
@@ -468,6 +736,9 @@ import Base from '../layouts/Base.astro';
     justify-content: space-between;
   }
   .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     font-weight: 700;
     font-size: 0.95rem;
     background: linear-gradient(90deg, var(--cyan), var(--purple));
@@ -475,12 +746,16 @@ import Base from '../layouts/Base.astro';
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .footer-links {
-    display: flex;
-    gap: 1.25rem;
-    font-size: 0.85rem;
-  }
-  .footer-links a { color: var(--text-muted); transition: color 0.15s; }
+  .footer-links { display: flex; gap: 1.5rem; font-size: 0.85rem; flex-wrap: wrap; }
+  .footer-links a { color: var(--muted); transition: color 0.15s; }
   .footer-links a:hover { color: #fff; }
   .footer-copy { font-size: 0.8rem; color: #475569; }
+  .footer-copy .link { color: var(--purple); }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .section { padding: 3.5rem 1rem; }
+    .hero { padding: 3.5rem 1rem 3rem; }
+    .nav-links { gap: 0.75rem; }
+  }
 </style>

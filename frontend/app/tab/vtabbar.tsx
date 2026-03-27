@@ -177,6 +177,7 @@ export function VTabBar({ workspace, className }: VTabBarProps) {
     const activeTabId = useAtomValue(env.atoms.staticTabId);
     const reinitVersion = useAtomValue(env.atoms.reinitVersion);
     const documentHasFocus = useAtomValue(env.atoms.documentHasFocus);
+    const focusFollowsCursor = useAtomValue(env.getSettingsKeyAtom("app:focusfollowscursor"));
     const tabIds = workspace?.tabids ?? [];
 
     const [orderedTabIds, setOrderedTabIds] = useState<string[]>(tabIds);
@@ -396,7 +397,12 @@ export function VTabBar({ workspace, className }: VTabBarProps) {
                                 clearDragState();
                             }}
                             onDragEnd={clearDragState}
-                            onHoverChanged={(isHovered) => setHoveredTabId(isHovered ? tabId : null)}
+                            onHoverChanged={(isHovered) => {
+                                setHoveredTabId(isHovered ? tabId : null);
+                                if (isHovered && focusFollowsCursor === "on") {
+                                    env.electron.setActiveTab(tabId);
+                                }
+                            }}
                         />
                     );
                 })}

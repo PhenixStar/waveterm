@@ -40,3 +40,5 @@ docsite/
 
 .kilo-format-temp-*
 .ruvector/
+plans/
+.service-pids

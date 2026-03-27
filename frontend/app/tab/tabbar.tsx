@@ -133,6 +133,7 @@ const TabBar = memo(({ workspace, noTabs }: TabBarProps) => {
     const showMenuBar = useAtomValue(env.getSettingsKeyAtom("window:showmenubar"));
     const confirmClose = useAtomValue(env.getSettingsKeyAtom("tab:confirmclose")) ?? false;
     const hideAiButton = useAtomValue(env.getSettingsKeyAtom("app:hideaibutton"));
+    const focusFollowsCursor = useAtomValue(env.getSettingsKeyAtom("app:focusfollowscursor"));
     const appUpdateStatus = useAtomValue(env.atoms.updaterStatusAtom);
 
     let prevDelta: number;
@@ -642,6 +643,11 @@ const TabBar = memo(({ workspace, noTabs }: TabBarProps) => {
                                     id={tabId}
                                     showDivider={showDivider}
                                     onSelect={() => handleSelectTab(tabId)}
+                                    onMouseEnter={() => {
+                                        if (focusFollowsCursor === "on") {
+                                            handleSelectTab(tabId);
+                                        }
+                                    }}
                                     active={isActive}
                                     onDragStart={(event) => handleDragStart(event, tabId, tabRefs.current[index])}
                                     onClose={(event) => handleCloseTab(event, tabId)}

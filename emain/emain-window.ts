@@ -190,16 +190,15 @@ export class WaveBrowserWindow extends BaseWindow {
                 winOpts.backgroundColor = "#222222";
             }
         } else if (opts.unamePlatform === "win32") {
-            if (settings["window:nativetitlebar"]) {
-                winOpts.titleBarStyle = "default";
-            } else {
-                winOpts.titleBarStyle = "hidden";
-                winOpts.titleBarOverlay = {
-                    color: "#222222",
-                    symbolColor: "#c3c8c2",
-                    height: 32,
-                };
-            }
+            // Always use hidden titlebar with overlay — gives native min/max/close
+            // buttons embedded in the app's own dark header (no double title bar).
+            // The overlay inherits the app's background color for seamless integration.
+            winOpts.titleBarStyle = "hidden";
+            winOpts.titleBarOverlay = {
+                color: settings["window:bgcolor"] || "#0a0a12",
+                symbolColor: "#c8ccd4",
+                height: 36,
+            };
             if (isTransparent) {
                 winOpts.transparent = true;
             } else if (isBlur) {

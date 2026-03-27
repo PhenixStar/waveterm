@@ -382,7 +382,7 @@ func GetLocalWshBinaryPath(version string, goos string, goarch string) (string, 
 	if !wavebase.SupportedWshBinaries[fmt.Sprintf("%s-%s", goos, goarch)] {
 		return "", fmt.Errorf("unsupported wsh platform: %s-%s", goos, goarch)
 	}
-	baseName := fmt.Sprintf("wsh-%s-%s.%s%s", version, goos, goarch, ext)
+	baseName := fmt.Sprintf("tsh-%s-%s.%s%s", version, goos, goarch, ext) // REBRAND: wsh → tsh
 	return filepath.Join(wavebase.GetWaveAppBinPath(), baseName), nil
 }
 

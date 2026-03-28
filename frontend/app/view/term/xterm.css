@@ -387,3 +387,11 @@
 .term-ai-error-apply:hover {
     opacity: 0.85;
 }
+
+/* Kaku-inspired: block cursor enhancements
+   - natural cell height: fills full cell when line_height > 1.0 (DOM renderer)
+   - improved visibility: subtle purple glow matching Terminolgy brand */
+.xterm .xterm-cursor-block {
+    height: 100% !important;
+    outline: 1px solid rgba(168, 85, 247, 0.3);
+}

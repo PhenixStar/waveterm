@@ -887,6 +887,24 @@ export class TermViewModel implements ViewModel {
                     },
                 });
                 menu.push({ type: "separator" });
+            } else {
+                // Kaku-inspired: local file path — reveal in OS file explorer
+                const revealLabel = isWindows() ? "Reveal in Explorer" : "Reveal in Finder";
+                menu.push({
+                    label: revealLabel,
+                    click: () => {
+                        // Strip line:col suffix (e.g. "src/file.ts:12:3" → "src/file.ts")
+                        const colonIdx = hoveredLinkUri.indexOf(":");
+                        const cleanPath =
+                            colonIdx > 0 && isWindows() && colonIdx !== 1
+                                ? hoveredLinkUri.substring(0, colonIdx)
+                                : colonIdx > 1
+                                  ? hoveredLinkUri.substring(0, colonIdx)
+                                  : hoveredLinkUri;
+                        getApi().openNativePath(cleanPath);
+                    },
+                });
+                menu.push({ type: "separator" });
             }
         }
 

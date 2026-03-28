@@ -186,7 +186,7 @@ export const FilesPage = ({ onFinish, onPrev }: { onFinish: () => void; onPrev?:
             RpcApi.RecordTEventCommand(TabRpcClient, {
                 event: "onboarding:fire",
                 props: {
-                    "onboarding:feature": "tsh",
+                    "onboarding:feature": "wsh",
                     "onboarding:version": CurrentOnboardingVersion,
                 },
             });

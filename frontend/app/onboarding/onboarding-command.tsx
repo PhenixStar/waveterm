@@ -119,7 +119,7 @@ export const EditBashrcCommand = ({ onComplete }: { onComplete?: () => void }) =
     const bashrcContent = `# Aliases
 alias ll="ls -lah"
 alias gst="git status"
-alias wave="tsh"
+alias wave="wsh"
 
 # Custom prompt
 PS1="\\[\\e[32m\\]\\u@\\h\\[\\e[0m\\]:\\[\\e[34m\\]\\w\\[\\e[0m\\]\\$ "

@@ -35,6 +35,14 @@ Terminolgy is an AI-native terminal for macOS, Linux, and Windows. Built on Elec
 - **Built-in Browser** — web views inside terminal blocks
 - **SSH Integration** — persistent sessions, wsh/tsh shell helper, remote file browsing
 - **Workspace System** — organize widgets by context (Ops, Dev, Network)
+- **ProcessViewer** — built-in task manager with live process list, CPU/memory sorting, and signal support
+- **Mouse Back/Forward** — browser-style navigation in web views via mouse buttons
+- **Widgets Sidebar Toggle** — show/hide the widget launcher without losing your layout
+- **Custom New Tab Layouts** — define default block arrangements for new tabs
+- **Dynamic Tab Titles** — tabs auto-rename based on active block content
+- **Auto OS Theme Switching** — follows system light/dark mode automatically
+- **MiniMax AI Preset** — one-click MiniMax model configuration in AI settings
+- **Reveal in Explorer/Finder** — right-click any file path to open it in the system file manager
 
 ## Install
 

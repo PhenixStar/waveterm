@@ -195,6 +195,10 @@ func MCPHandler(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, req.ID, toolsListResult{Tools: registeredTools})
 
 	case "tools/call":
+		if len(req.Params) == 0 {
+			writeJSONError(w, req.ID, -32602, "params required for tools/call")
+			return
+		}
 		var params toolCallParams
 		if err := json.Unmarshal(req.Params, &params); err != nil {
 			writeJSONError(w, req.ID, -32602, "invalid params")

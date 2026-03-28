@@ -147,7 +147,7 @@ const TabBar = memo(({ workspace, noTabs }: TabBarProps) => {
     const rightContainerRef = useRef<HTMLDivElement>(null);
     const workspaceSwitcherRef = useRef<HTMLDivElement>(null);
     const waveAIButtonRef = useRef<HTMLDivElement>(null);
-    const widgetsSidebarButtonRef = createRef<HTMLDivElement>();
+    const widgetsSidebarButtonRef = useRef<HTMLDivElement>(null);
     const appMenuButtonRef = useRef<HTMLDivElement>(null);
     const tabWidthRef = useRef<number>(TabDefaultWidth);
     const scrollableRef = useRef<boolean>(false);

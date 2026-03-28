@@ -211,16 +211,16 @@ function AppAutoThemeUpdater() {
         if (!api?.getNativeThemeIsDark || !api?.onNativeThemeChange) {
             return;
         }
-        // no-op: theme is read-only in this component; actual term theme switching
-        // is handled by listening for the OS theme change event and posting it
-        // as a custom DOM event that TermThemeUpdater can react to.
         const handler = (isDark: boolean) => {
             const themeName = isDark ? "default-dark" : "default-light";
             document.body.dispatchEvent(new CustomEvent("wave:os-theme-change", { detail: { themeName } }));
         };
-        api.onNativeThemeChange(handler);
+        const wrapped = api.onNativeThemeChange(handler);
         // trigger immediately on mount
         handler(api.getNativeThemeIsDark());
+        return () => {
+            api.offNativeThemeChange?.(wrapped);
+        };
     }, [autoTheme]);
 
     return null;

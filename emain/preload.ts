@@ -73,8 +73,13 @@ contextBridge.exposeInMainWorld("api", {
     saveTextFile: (fileName: string, content: string) => ipcRenderer.invoke("save-text-file", fileName, content),
     setIsActive: () => ipcRenderer.invoke("set-is-active"),
     getNativeThemeIsDark: () => ipcRenderer.sendSync("get-native-theme") as boolean,
-    onNativeThemeChange: (callback: (isDark: boolean) => void) =>
-        ipcRenderer.on("native-theme-change", (_event, isDark: boolean) => callback(isDark)),
+    onNativeThemeChange: (callback: (isDark: boolean) => void) => {
+        const wrapped = (_event: Electron.IpcRendererEvent, isDark: boolean) => callback(isDark);
+        ipcRenderer.on("native-theme-change", wrapped);
+        return wrapped;
+    },
+    offNativeThemeChange: (wrapped: (event: Electron.IpcRendererEvent, isDark: boolean) => void) =>
+        ipcRenderer.removeListener("native-theme-change", wrapped),
 });
 
 // Custom event for "new-window"

@@ -136,7 +136,8 @@ declare global {
         saveTextFile: (fileName: string, content: string) => Promise<boolean>; // save-text-file
         setIsActive: () => Promise<void>; // set-is-active
         getNativeThemeIsDark: () => boolean; // get-native-theme
-        onNativeThemeChange: (callback: (isDark: boolean) => void) => void; // native-theme-change
+        onNativeThemeChange: (callback: (isDark: boolean) => void) => (event: unknown, isDark: boolean) => void; // native-theme-change
+        offNativeThemeChange: (wrapped: (event: unknown, isDark: boolean) => void) => void; // native-theme-change off
     };
 
     type ElectronContextMenuItem = {

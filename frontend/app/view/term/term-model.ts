@@ -827,6 +827,65 @@ export class TermViewModel implements ViewModel {
         });
     }
 
+    getBlockOutputMenuItems(): ContextMenuItem[] {
+        const blockId = this.blockId;
+        const blockAtom = this.blockAtom;
+        return [
+            {
+                label: "Copy All Output",
+                click: async () => {
+                    const route = makeFeBlockRouteId(blockId);
+                    const data = await RpcApi.TermGetScrollbackLinesCommand(
+                        TabRpcClient,
+                        { linestart: 0, lineend: 9999, lastcommand: false },
+                        { route }
+                    );
+                    if (data?.lines) {
+                        navigator.clipboard.writeText(data.lines.join("\n"));
+                    }
+                },
+            },
+            {
+                label: "Copy Last Command + Output",
+                click: async () => {
+                    const route = makeFeBlockRouteId(blockId);
+                    const data = await RpcApi.TermGetScrollbackLinesCommand(
+                        TabRpcClient,
+                        { linestart: 0, lineend: 9999, lastcommand: true },
+                        { route }
+                    );
+                    if (data?.lines) {
+                        navigator.clipboard.writeText(data.lines.join("\n"));
+                    }
+                },
+            },
+            {
+                label: "Share as Gist",
+                click: async () => {
+                    const route = makeFeBlockRouteId(blockId);
+                    const data = await RpcApi.TermGetScrollbackLinesCommand(
+                        TabRpcClient,
+                        { linestart: 0, lineend: 9999, lastcommand: false },
+                        { route }
+                    );
+                    if (data?.lines) {
+                        const blockData = globalStore.get(blockAtom);
+                        const connName = blockData?.meta?.connection ?? "local";
+                        const timestamp = new Date().toISOString();
+                        const formatted = [
+                            "--- Terminolgy Block Output ---",
+                            `Host: ${connName}`,
+                            `Time: ${timestamp}`,
+                            "---",
+                            data.lines.join("\n"),
+                        ].join("\n");
+                        navigator.clipboard.writeText(formatted);
+                    }
+                },
+            },
+        ];
+    }
+
     getContextMenuItems(): ContextMenuItem[] {
         const menu: ContextMenuItem[] = [];
         const hasSelection = this.termRef.current?.terminal?.hasSelection();
@@ -914,6 +973,10 @@ export class TermViewModel implements ViewModel {
                 getApi().nativePaste();
             },
         });
+
+        menu.push({ type: "separator" });
+
+        menu.push(...this.getBlockOutputMenuItems());
 
         menu.push({ type: "separator" });
 

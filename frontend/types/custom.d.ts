@@ -357,6 +357,9 @@ declare global {
         // Returns menu items for the settings dropdown.
         getSettingsMenuItems?: () => ContextMenuItem[];
 
+        // Returns menu items for block output sharing (copy/share).
+        getBlockOutputMenuItems?: () => ContextMenuItem[];
+
         // Attempts to give focus to the block, returning true if successful.
         giveFocus?: () => boolean;
 

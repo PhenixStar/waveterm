@@ -67,6 +67,8 @@ function handleHeaderContextMenu(
             },
         },
     ];
+    const outputItems = viewModel?.getBlockOutputMenuItems?.();
+    if (outputItems && outputItems.length > 0) menu.push({ type: "separator" }, ...outputItems);
     const extraItems = viewModel?.getSettingsMenuItems?.();
     if (extraItems && extraItems.length > 0) menu.push({ type: "separator" }, ...extraItems);
     menu.push(
